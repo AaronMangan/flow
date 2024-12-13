@@ -9,7 +9,8 @@ import {
   ArrowLeftStartOnRectangleIcon,
   XMarkIcon,
   ClipboardDocumentListIcon,
-  DocumentCheckIcon
+  DocumentCheckIcon,
+  ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
@@ -55,7 +56,12 @@ const menuItems = [
         name: 'Revisions',
         icon: <DocumentCheckIcon className='w-7 h-7' />,
         path: '/revisions'
-      }
+      },
+      {
+        name: 'Statuses',
+        icon: <ArchiveBoxIcon className='w-7 h-7' />,
+        path: '/statuses'
+      },
     ]
   }
 ];

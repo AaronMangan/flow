@@ -15,7 +15,11 @@ export default function FormGenerator({ className, config, valuesCallback, value
   useEffect(() => {
     let formValues = formData || null;
     formData && config && config.map((item) => {
-        formValues[item.id] = values[item.id] || item.default || ''
+        if(item.type == 'checkbox') {
+          formValues[item.id] = values[item.id] || item.default || false
+        } else {
+          formValues[item.id] = values[item.id] || item.default || ''
+        }
     });
     setFormData(formValues)
   }, []);
@@ -31,14 +35,14 @@ export default function FormGenerator({ className, config, valuesCallback, value
    */
   const makeApisCallForData = (filterObj) => {
     if(filterObj?.endpoint) {
-        axios.get(filterObj.endpoint).then(response => {
-            if (response?.data?.status && response?.data?.status == 'success') {
-                const api = response?.data?.data.map(item => {
-                    return item;
-                })
-                setApiData({...apiData, [filterObj.id]: api});
-            }
-        })
+      axios.get(filterObj.endpoint).then(response => {
+        if (response?.data?.status && response?.data?.status == 'success') {
+          const api = response?.data?.data.map(item => {
+            return item;
+          })
+          setApiData({...apiData, [filterObj.id]: api});
+        }
+      })
     };
   };
 
