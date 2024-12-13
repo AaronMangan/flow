@@ -37,7 +37,11 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        //
+        // Super role can view all users
+        if ($user->hasAnyRole(['super', 'admin'])) {
+            return true;
+        }
+        return false;
     }
 
     /**

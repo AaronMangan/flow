@@ -53,15 +53,19 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        if ($request->user()->cannot('create', User::class)) {
+            abort(403, 'Unauthorised');
+        }
+
         // Get the data for the user.
-        $data = $request->safe()->only(['name', 'email', 'status_id']);
+        $data = $request->safe()->only(['name', 'email', 'status_id', 'organisation_id']);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'status_id' => $data['status_id'] ?? Status::ACTIVE,
-            'organisation_id' => (auth()->user()->hasRole('super')) ? $data['organisation_id'] : auth()->user()->organisation_id
+            'organisation_id' => $data['organisation_id'] ?? auth()->user()->organisation_id
         ]);
 
         event(new Registered($user));

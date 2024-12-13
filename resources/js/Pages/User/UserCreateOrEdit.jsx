@@ -5,10 +5,12 @@ import InputLabel from '@/Components/InputLabel';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
 import InputError from '@/Components/InputError';
+import axios from 'axios';
 
 export default function UserCreateOrEdit({auth, statuses}) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [organisations, setOrganisations] = useState({});
   
   const handleChange = (e) => {
       const { name, value } = e.target;
@@ -23,7 +25,7 @@ export default function UserCreateOrEdit({auth, statuses}) {
     password: '',
     password_confirmation: '',
     status_id: 1,
-    organisation_id: auth.organisation_id
+    organisation_id: auth?.user?.organisation_id
   });
 
   const handleSubmit = async (e) => {
@@ -50,10 +52,34 @@ export default function UserCreateOrEdit({auth, statuses}) {
       }
     }
   };
+
+  /**
+   * Check if the user is a super admin or not.
+   * @returns 
+   */
+  const isSuper = () => {
+    const userRoles = auth?.user?.roles?.map(role => {
+      return role.name
+    })
+    return userRoles.includes('super');
+  }
     
   // Run this logic when 'mounted'
   useEffect(() => {
     // 
+    console.log(auth?.user?.organisation_id);
+    if(isSuper()) {
+      axios.get('/api/organisations').then(response => {
+        const mapped = response?.data?.map(org => {
+          return {
+            value: org.id,
+            label: org.name
+          }
+        })
+        setOrganisations(null);
+        setOrganisations(mapped);
+      })
+    }
   }, []);
   
   return (
@@ -123,7 +149,7 @@ export default function UserCreateOrEdit({auth, statuses}) {
                     {errors.password_confirmation && <p className="mt-1 text-xs text-red-500">{errors.password_confirmation[0]}</p>}
                   </div>
 
-                  {/* Confirm Password */}
+                  {/* Status */}
                   <div className="mb-6">
                     <InputLabel
                       htmlFor="status"
@@ -147,6 +173,31 @@ export default function UserCreateOrEdit({auth, statuses}) {
                       className="mt-2"
                     />}
                   </div>
+
+                  {/* Organisation - Show if user is a super admin only */}
+                  {isSuper() && <div className="mb-6">
+                    <InputLabel
+                      htmlFor="organisation_id"
+                      value="Organisation"
+                      className=""
+                    />
+                    <Select
+                      id='organisation_id'
+                      name='organisation_id'
+                      options={organisations}
+                      onChange={(e) => {
+                        setFormData({...formData, organisation_id: e.value})
+                      }}
+                      placeholder='Please select an Organisation'
+                      menuPlacement='top'
+                      value={isSuper && organisations.find(x => x.value == formData.organisation_id)}
+                      className='border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600'
+                    />
+                    {errors && errors.status_id && <InputError
+                      message={errors.status_id}
+                      className="mt-2"
+                    />}
+                  </div>}
 
                   {/* Submit Button */}
                   <div className="flex justify-center">

@@ -54,6 +54,15 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/activity-log/{activity_log}/view', [ActivityLogController::class, 'show'])->name('activity-log.show');
 });
 
+/**
+ * Revisions routes
+ */
+Route::middleware(['role:super|admin', 'auth'])->group(function () {
+    Route::get('/revisions', [\App\Http\Controllers\RevisionController::class, 'index'])->name('revisions');
+    Route::post('/revision', [\App\Http\Controllers\RevisionController::class, 'store'])->name('revision.create');
+    Route::post('/revision/{revision}/update', [\App\Http\Controllers\RevisionController::class, 'update'])->name('revision.update');
+    Route::delete('/revision/{revision}/delete', [\App\Http\Controllers\RevisionController::class, 'destroy'])->name('revision.destroy');
+});
 
 // Add auth routes.
 require __DIR__.'/auth.php';

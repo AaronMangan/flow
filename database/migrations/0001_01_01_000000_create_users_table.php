@@ -43,7 +43,7 @@ return new class () extends Migration {
     public function down(): void
     {
         // Remove timestamps.
-        Schema::table('flights', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
         Schema::dropIfExists('users');

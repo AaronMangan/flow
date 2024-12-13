@@ -7,7 +7,9 @@ import {
   UserGroupIcon,
   WrenchScrewdriverIcon,
   ArrowLeftStartOnRectangleIcon,
-  XMarkIcon
+  XMarkIcon,
+  ClipboardDocumentListIcon,
+  DocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
@@ -41,6 +43,18 @@ const menuItems = [
         icon: <QueueListIcon className='w-7 h-7' />,
         path: '/activity-log',
         children: []
+      }
+    ]
+  },
+  {
+    name: 'Meta',
+    icon: <ClipboardDocumentListIcon className='w-7 h-7' />,
+    path: '',
+    children: [
+      {
+        name: 'Revisions',
+        icon: <DocumentCheckIcon className='w-7 h-7' />,
+        path: '/revisions'
       }
     ]
   }

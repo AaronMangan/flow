@@ -45,4 +45,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'data' => $data ?? []
         ]);
     });
+
+    /**
+     *
+     */
+    Route::get('/organisations', function (Request $request) {
+        if (!$request->user()->hasRole('super')) {
+            abort(404, 'Unauthorised');
+        }
+
+        return \App\Models\Organisation::get(['id', 'name']);
+    });
 });

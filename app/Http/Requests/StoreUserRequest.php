@@ -12,7 +12,11 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return \Auth::user()->hasAnyRole(['super', 'admin']) ?? false;
+        if (\Auth::user()->hasRole('super')) {
+            return true;
+        } else {
+            return (\Auth::user()->hasRole('admin') && $this->organisation_id == \Auth::user()->organisation_id) ? true : false;
+        }
     }
 
     /**
@@ -25,7 +29,8 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['string', 'required', 'max:255'],
             'email' => ['email', 'required'],
-            'status_id' => ['numeric', 'exists:statuses,id']
+            'status_id' => ['numeric', 'exists:statuses,id'],
+            'organisation_id' => ['numeric', 'exists:organisations,id']
         ];
     }
 }
