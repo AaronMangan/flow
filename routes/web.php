@@ -71,7 +71,7 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/statuses', [\App\Http\Controllers\DocumentStatusController::class, 'index'])->name('statuses');
     Route::post('/status', [\App\Http\Controllers\DocumentStatusController::class, 'store'])->name('status.create');
     Route::post('/status/{status}/update', [\App\Http\Controllers\DocumentStatusController::class, 'update'])->name('status.update');
-    Route::delete('/revision/{status}/delete', [\App\Http\Controllers\DocumentStatusController::class, 'destroy'])->name('status.destroy');
+    Route::delete('/status/{status}/delete', [\App\Http\Controllers\DocumentStatusController::class, 'destroy'])->name('status.destroy');
 });
 
 // Add auth routes.

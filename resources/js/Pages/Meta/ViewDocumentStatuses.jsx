@@ -168,9 +168,13 @@ export default function ViewDocumentStatuses({ statuses }) {
           toast.success('Document Status created successfully!');
           setActiveStatus(null);
           setShowCreateStatus(false);
+          router.visit(route('statuses'), {
+            only: ['statuses'],
+            preserveState: true,
+          })
         },
         onError: () => {
-            toast.error('An error occurred, please contact your administrator for assistance');
+          toast.error('An error occurred, please contact your administrator for assistance');
         }
       })
     }
@@ -185,6 +189,7 @@ export default function ViewDocumentStatuses({ statuses }) {
           reset();
           router.visit(route('statuses'), {
             only: ['statuses'],
+            preserveState: true,
           })
         } else {
           toast.error('Unable to delete the revision. Please check you have access or contact your administrator');

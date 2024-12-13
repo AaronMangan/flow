@@ -51,8 +51,7 @@ class DocumentStatusController extends Controller
         ]);
 
         return Inertia::render('Meta/ViewDocumentStatuses', [
-            'revisions' => $this->getStatuses(),
-            'status' => $status ? 'success' : 'fail'
+            'revisions' => $this->getStatuses()
         ]);
     }
 
@@ -85,8 +84,7 @@ class DocumentStatusController extends Controller
         $result = $status->update($data);
 
         return Inertia::render('Meta/ViewDocumentStatuses', [
-            'revisions' => $this->getStatuses(),
-            'status' => $result ? 'success' : 'fail'
+            'statuses' => $this->getStatuses()
         ]);
     }
 
