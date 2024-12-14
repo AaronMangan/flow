@@ -31,11 +31,10 @@ export default function Config({ auth, config }) {
     })
 
     /**
-     * 
+     * Return a listing of organisations.
      */
     const getOrganisations = () => {
         axios.get(route('api.organisations')).then(response => {
-            // 
             if(response.status == 200) {
                 setOrganisations([]);
                 setOrganisations(response?.data?.map(org => {
