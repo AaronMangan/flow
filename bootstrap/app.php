@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'discipline' => \App\Http\Middleware\DisciplineMiddleware::class,
+            'type' => \App\Http\Middleware\TypeMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

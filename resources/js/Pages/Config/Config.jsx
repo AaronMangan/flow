@@ -16,6 +16,7 @@ import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
 import Tooltip from '@/Components/Tooltip';
 import Notification from '@/Components/Notification';
+import { router } from '@inertiajs/react'
 
 export default function Config({ auth, config }) {
     const { userHasRole } = useUser(auth?.user);

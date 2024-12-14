@@ -11,7 +11,8 @@ import {
   ClipboardDocumentListIcon,
   DocumentCheckIcon,
   ArchiveBoxIcon,
-  CubeIcon
+  CubeIcon,
+  CircleStackIcon,
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
@@ -85,6 +86,12 @@ const Sidebar = ({ user }) => {
           icon: <CubeIcon className='w-7 h-7' />,
           path: '/disciplines',
           visibility: () => ((userHasRole('admin') || userHasRole('super')) && user?.config?.disciplines),
+        },
+        {
+          name: 'Types',
+          icon: <CircleStackIcon className='w-7 h-7' />,
+          path: '/types',
+          visibility: () => ((userHasRole('admin') || userHasRole('super')) && user?.config?.types),
         },
       ]
     }

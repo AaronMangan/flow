@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
  * Config Routes
  */
 Route::middleware(['role:super|admin', 'auth'])->group(function () {
-    Route::get('/config', [ConfigController::class, 'index'])->middleware(['role:super|admin'])->name('config.index');
+    Route::get('/config', [ConfigController::class, 'index'])->middleware(['role:super|admin'])->name('config');
     Route::post('/config', [ConfigController::class, 'store'])->middleware(['role:super|admin'])->name('config.store');
     Route::post('/config/{config}/update', [ConfigController::class, 'update'])->middleware(['role:super|admin'])->name('config.update');
 });
@@ -83,6 +83,16 @@ Route::middleware(['role:super|admin', 'auth', 'discipline'])->group(function ()
     Route::post('/discipline', [\App\Http\Controllers\DisciplineController::class, 'store'])->name('discipline.create');
     Route::post('/discipline/{discipline}/update', [\App\Http\Controllers\DisciplineController::class, 'update'])->name('discipline.update');
     Route::delete('/discipline/{discipline}/delete', [\App\Http\Controllers\DisciplineController::class, 'destroy'])->name('discipline.destroy');
+});
+
+/**
+ * Type Routes
+ */
+Route::middleware(['role:super|admin', 'auth', 'type'])->group(function () {
+    Route::get('/types', [\App\Http\Controllers\TypeController::class, 'index'])->name('types');
+    Route::post('/type', [\App\Http\Controllers\TypeController::class, 'store'])->name('type.create');
+    Route::post('/type/{type}/update', [\App\Http\Controllers\TypeController::class, 'update'])->name('type.update');
+    Route::delete('/type/{type}/delete', [\App\Http\Controllers\TypeController::class, 'destroy'])->name('type.destroy');
 });
 
 // Add auth routes.
