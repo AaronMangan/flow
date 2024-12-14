@@ -135,6 +135,16 @@ export default function ViewDocumentStatuses({ statuses }) {
   }
 
   /**
+   * Reloads the data without reloading the page.
+   */
+  const refreshData = () => {
+    router.visit(route('statuses'), {
+      only: ['statuses'],
+      preserveState: true,
+    })
+  }
+
+  /**
    * Close Modal
    */
   const closeModal = () => {
@@ -155,10 +165,7 @@ export default function ViewDocumentStatuses({ statuses }) {
             toast.success('Document Status updated successfully');
             setShowCreateStatus(false);
             setActiveStatus(null);
-            router.visit(route('statuses'), {
-              only: ['statuses'],
-              preserveState: true,
-            })
+            refreshData();
           },
           onError: () => {
             toast.error('An error occurred, please contact your administrator');
@@ -170,10 +177,7 @@ export default function ViewDocumentStatuses({ statuses }) {
           toast.success('Document Status created successfully!');
           setActiveStatus(null);
           setShowCreateStatus(false);
-          router.visit(route('statuses'), {
-            only: ['statuses'],
-            preserveState: true,
-          })
+          refreshData();
         },
         onError: () => {
           toast.error('An error occurred, please contact your administrator for assistance');
@@ -228,7 +232,7 @@ export default function ViewDocumentStatuses({ statuses }) {
       <Modal show={showCreateStatus} onClose={closeModal}>
         <form onSubmit={(e) => {postStatus(e)}} className="p-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Add New Status
+            {activeStatus && activeStatus?.id > 0 ? 'Edit ' + activeStatus?.name : 'Add New Status'}
           </h2>
           <FormGenerator
             className='w-full'

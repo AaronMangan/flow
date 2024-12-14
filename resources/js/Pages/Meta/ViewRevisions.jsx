@@ -134,6 +134,16 @@ export default function ViewRevisions({ revisions }) {
     setData(values);
   }
 
+    /**
+     * Reloads the data without reloading the page.
+     */
+    const refreshData = () => {
+      router.visit(route('revisions'), {
+        only: ['revisions'],
+        preserveState: true,
+      })
+    }
+
   /**
    * Close Modal
    */
@@ -152,12 +162,13 @@ export default function ViewRevisions({ revisions }) {
     if(activeRevision?.id) {
         post(route('revision.update', {revision: activeRevision}), {
             onSuccess: () => {
-                toast.success('Revision updated successfully');
-                setShowCreateRevision(false);
-                setActiveRevision(null);
+              toast.success('Revision updated successfully');
+              setShowCreateRevision(false);
+              setActiveRevision(null);
+              refreshData();
             },
             onError: () => {
-                toast.error('An error occurred, please contact your administrator');
+              toast.error('An error occurred, please contact your administrator');
             },
         });
     } else {
@@ -166,9 +177,10 @@ export default function ViewRevisions({ revisions }) {
           toast.success('Revision created successfully!');
           setActiveRevision(null);
           setShowCreateRevision(false);
+          refreshData();
         },
         onError: () => {
-            toast.error('An error occurred, please contact your administrator for assistance');
+          toast.error('An error occurred, please contact your administrator for assistance');
         }
       })
     }
@@ -177,13 +189,11 @@ export default function ViewRevisions({ revisions }) {
   const deleteRevision = (id) => {
     axios.delete(route('revision.destroy', {revision: id})).then((response) => {
         if(response?.status == 200) {
-            toast.success('Revision deleted successfully');
-            reset();
-            router.visit(route('revisions'), {
-                only: ['revisions'],
-            })
+          toast.success('Revision deleted successfully');
+          reset();
+          refreshData();
         } else {
-            toast.error('Unable to delete the revision. Please check you have access or contact your administrator');
+          toast.error('Unable to delete the revision. Please check you have access or contact your administrator');
         }
     })
   }
@@ -217,7 +227,7 @@ export default function ViewRevisions({ revisions }) {
       <Modal show={showCreateRevision} onClose={closeModal}>
         <form onSubmit={(e) => {postRevision(e)}} className="p-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Add New Revision
+            {activeRevision && activeRevision?.id > 0 ? 'Edit ' + activeRevision?.name : 'Add New Revision'}
           </h2>
           <FormGenerator
             className='w-full'

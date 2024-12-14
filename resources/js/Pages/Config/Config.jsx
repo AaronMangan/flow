@@ -186,7 +186,8 @@ export default function Config({ auth, config }) {
             setData({
                 name: row?.name || '',
                 values: JSON.stringify(row?.values) || '',
-                organisation_id: !userHasRole('super') ? auth?.user?.organisation_id : row?.organisation_id
+                // organisation_id: !userHasRole('super') ? auth?.user?.organisation_id : row?.organisation_id
+                organisation_id: row?.organisation_id
             })
         }
         setCreateSetting(true);

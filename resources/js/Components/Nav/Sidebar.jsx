@@ -53,7 +53,7 @@ const Sidebar = ({ user }) => {
           name: 'Config',
           icon: <WrenchScrewdriverIcon className="w-7 h-7" />,
           path: '/config',
-          visibility: () => (userHasRole('admin') || userHasRole('super')),
+          visibility: () => (userHasRole('super')),
         },
         {
           name: 'Activity',

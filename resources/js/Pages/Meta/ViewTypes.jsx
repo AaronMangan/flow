@@ -123,6 +123,16 @@ export default function ViewTypes({ types }) {
   }
 
   /**
+   * Reloads the data without reloading the page.
+   */
+  const refreshData = () => {
+    router.visit(route('types'), {
+      only: ['types'],
+      preserveState: true,
+    })
+  }
+
+  /**
    * Close Modal
    */
   const closeModal = () => {
@@ -143,6 +153,7 @@ export default function ViewTypes({ types }) {
                 toast.success('Type updated successfully');
                 setShowCreateType(false);
                 setActiveType(null);
+                refreshData();
             },
             onError: () => {
                 toast.error('An error occurred, please contact your administrator');
@@ -154,6 +165,7 @@ export default function ViewTypes({ types }) {
           toast.success('Type created successfully!');
           setActiveType(null);
           setShowCreateType(false);
+          refreshData();
         },
         onError: () => {
             toast.error('An error occurred, please contact your administrator for assistance');
@@ -167,9 +179,7 @@ export default function ViewTypes({ types }) {
         if(response?.status == 200) {
             toast.success('Type deleted successfully');
             reset();
-            router.visit(route('types'), {
-              only: ['types'],
-            })
+            refreshData();
         } else {
             toast.error('Unable to delete the type. Please check you have access or contact your administrator');
         }
@@ -205,7 +215,7 @@ export default function ViewTypes({ types }) {
       <Modal show={showCreateType} onClose={closeModal}>
         <form onSubmit={(e) => {postType(e)}} className="p-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Add New Type
+            {activeType && activeType?.id > 0 ? 'Edit ' + activeType?.name : 'Add New Type'}
           </h2>
           <FormGenerator
             className='w-full'

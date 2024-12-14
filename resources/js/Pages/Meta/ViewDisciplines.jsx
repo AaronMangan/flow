@@ -132,6 +132,15 @@ export default function ViewDisciplines({ disciplines }) {
   }
 
   /**
+   * Reloads the data without reloading the page.
+   */
+  const refreshData = () => {
+    router.visit(route('disciplines'), {
+      only: ['disciplines'],
+    })
+  }
+
+  /**
    * Save the discipline
    * @param {*} e 
    */
@@ -143,6 +152,7 @@ export default function ViewDisciplines({ disciplines }) {
                 toast.success('Discipline updated successfully');
                 setShowCreateDiscipline(false);
                 setActiveDiscipline(null);
+                refreshData();
             },
             onError: () => {
                 toast.error('An error occurred, please contact your administrator');
@@ -154,6 +164,7 @@ export default function ViewDisciplines({ disciplines }) {
           toast.success('Discipline created successfully!');
           setActiveDiscipline(null);
           setShowCreateDiscipline(false);
+          refreshData();
         },
         onError: () => {
             toast.error('An error occurred, please contact your administrator for assistance');
@@ -167,9 +178,7 @@ export default function ViewDisciplines({ disciplines }) {
         if(response?.status == 200) {
             toast.success('Discipline deleted successfully');
             reset();
-            router.visit(route('disciplines'), {
-              only: ['disciplines'],
-            })
+            refreshData();
         } else {
             toast.error('Unable to delete the discipline. Please check you have access or contact your administrator');
         }
@@ -205,7 +214,7 @@ export default function ViewDisciplines({ disciplines }) {
       <Modal show={showCreateDiscipline} onClose={closeModal}>
         <form onSubmit={(e) => {postDiscipline(e)}} className="p-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Add New Discipline
+          {activeDiscipline && activeDiscipline?.id > 0 ? 'Edit ' + activeDiscipline?.name : 'Add New Discipline'}
           </h2>
           <FormGenerator
             className='w-full'
