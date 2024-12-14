@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import DataTable from 'react-data-table-component';
 import dayjs from 'dayjs';
 import { Inertia } from '@inertiajs/inertia';
@@ -34,13 +34,21 @@ export default function Dashboard({ history, filters }) {
     {
       id: 'event',
       name: 'Event',
-      selector: row => row.event,
+      cell: (row) => {
+        return (
+          <Link href={route('activity-log.show', {activity_log: row})} method="get">{row.event}</Link>
+        )
+      },
       width: 'auto'
     },
     {
       id: 'data',
       name: 'Changes',
-      selector: row => row?.data?.length > 250 ? row?.data?.slice(0, 250) + '...' : row?.data || 'created',
+      cell: (row) => {
+        return (
+          <Link href={route('activity-log.show', {activity_log: row})} method="get">{row?.data?.length > 250 ? row?.data?.slice(0, 250) + '...' : row?.data || 'created'}</Link>
+        );
+      },
       width: '40pc'
     },
     {
@@ -112,9 +120,6 @@ export default function Dashboard({ history, filters }) {
                   columns={columns}
                   data={data}
                   className='z-0'
-                  onRowClicked={(row) => {
-                    Inertia.get(`/activity-log/${row.id}/view`, {}, { preserveState: true });
-                  }}
                 />
               </div>
               {/* Pagination controls */}

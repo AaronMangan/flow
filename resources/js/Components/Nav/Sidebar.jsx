@@ -13,58 +13,7 @@ import {
   ArchiveBoxIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
-
-/**
- * Menu Items.
- */
-const menuItems = [
-  {
-    name: 'Home',
-    icon: <HomeIcon className="w-7 h-7" />,
-    path: '/dashboard',
-    children: []
-  },
-  {
-    name: 'Manage',
-    icon: <Cog6ToothIcon className="w-7 h-7" />,
-    path: '',
-    children: [
-      {
-        name: 'Users',
-        icon: <UserGroupIcon className="w-7 h-7" />,
-        path: '/users',
-      },
-      {
-        name: 'Config',
-        icon: <WrenchScrewdriverIcon className="w-7 h-7" />,
-        path: '/config',
-      },
-      {
-        name: 'Activity',
-        icon: <QueueListIcon className='w-7 h-7' />,
-        path: '/activity-log',
-        children: []
-      }
-    ]
-  },
-  {
-    name: 'Meta',
-    icon: <ClipboardDocumentListIcon className='w-7 h-7' />,
-    path: '',
-    children: [
-      {
-        name: 'Revisions',
-        icon: <DocumentCheckIcon className='w-7 h-7' />,
-        path: '/revisions'
-      },
-      {
-        name: 'Statuses',
-        icon: <ArchiveBoxIcon className='w-7 h-7' />,
-        path: '/statuses'
-      },
-    ]
-  }
-];
+import { useUser } from '@/Flow/useUser';
 
 /**
  * Define the sidebar used for navigation.
@@ -74,6 +23,62 @@ const menuItems = [
 const Sidebar = ({ user }) => {
   const [collapsed, setCollapsed] = useState(true);
   const [openItem, setOpenItem] = useState(null);
+  const { userHasRole } = useUser(user)
+  
+  /**
+   * Menu Items.
+   */
+  const menuItems = [
+    {
+      visibility: () => true,
+      name: 'Home',
+      icon: <HomeIcon className="w-7 h-7" />,
+      path: '/dashboard',
+      children: []
+    },
+    {
+      visibility: () => (userHasRole('admin') || userHasRole('super')),
+      name: 'Manage',
+      icon: <Cog6ToothIcon className="w-7 h-7" />,
+      path: '',
+      children: [
+        {
+          name: 'Users',
+          icon: <UserGroupIcon className="w-7 h-7" />,
+          path: '/users',
+        },
+        {
+          name: 'Config',
+          icon: <WrenchScrewdriverIcon className="w-7 h-7" />,
+          path: '/config',
+        },
+        {
+          name: 'Activity',
+          icon: <QueueListIcon className='w-7 h-7' />,
+          path: '/activity-log',
+          children: []
+        }
+      ]
+    },
+    {
+      visibility: () => (userHasRole('admin') || userHasRole('super')),
+      name: 'Meta',
+      icon: <ClipboardDocumentListIcon className='w-7 h-7' />,
+      path: '',
+      children: [
+        {
+          name: 'Revisions',
+          icon: <DocumentCheckIcon className='w-7 h-7' />,
+          path: '/revisions'
+        },
+        {
+          name: 'Statuses',
+          icon: <ArchiveBoxIcon className='w-7 h-7' />,
+          path: '/statuses'
+        },
+      ]
+    }
+  ];
 
   const toggleSubMenu = (index) => {
     setOpenItem(openItem === index ? null : index);  // Toggle the open/close of sub-items
@@ -143,31 +148,35 @@ const Sidebar = ({ user }) => {
       <nav className="mt-6">
         <ul>
           {/* Handle menu items */}
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <div
-                className="flex items-center px-2 py-2 space-x-4 hover:bg-gray-700"
-                onClick={() => {handleItemClick(item, index)}}
-              >
-                <span className="w-7 h-7">{item.icon}</span>
-                {!collapsed && <span>{item.name}</span>}
-              </div>
-
-              {/* Handle sub-menu items (children) */}
-              {item.children.length > 0 && openItem === index && (
-                <ul className={`ml-6 ${collapsed ? 'hidden' : ''}`}>
-                  {item.children.map((subItem, subIndex) => (
-                    <li key={subIndex}>
-                      <div onClick={() => {handleItemClick(subItem, subIndex)}} className="flex items-center px-4 py-2 space-x-4 hover:bg-gray-600">
-                        <span className="w-7 h-7">{subItem.icon}</span>
-                        {!collapsed && <span>{subItem.name}</span>}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+          {menuItems.map((item, index) => {
+            if(item?.visibility()) {
+              return (
+                <li key={index}>
+                  <div
+                    className="flex items-center px-2 py-2 space-x-4 hover:bg-gray-700"
+                    onClick={() => {handleItemClick(item, index)}}
+                  >
+                    <span className="w-7 h-7">{item.icon}</span>
+                    {!collapsed && <span>{item.name}</span>}
+                  </div>
+    
+                  {/* Handle sub-menu items (children) */}
+                  {item.children.length > 0 && openItem === index && (
+                    <ul className={`ml-6 ${collapsed ? 'hidden' : ''}`}>
+                      {item.children.map((subItem, subIndex) => (
+                        <li key={subIndex}>
+                          <div onClick={() => {handleItemClick(subItem, subIndex)}} className="flex items-center px-4 py-2 space-x-4 hover:bg-gray-600">
+                            <span className="w-7 h-7">{subItem.icon}</span>
+                            {!collapsed && <span>{subItem.name}</span>}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              )
+            }
+          })}
             <li key='logout_link'>
               <div
                 className="flex items-center px-2 py-2 mt-4 space-x-4 hover:bg-gray-700"

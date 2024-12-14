@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\LogsActivity;
+use Illuminate\Support\Arr;
 
 class Config extends Model
 {
@@ -36,5 +37,10 @@ class Config extends Model
     public function organisation(): ?BelongsTo
     {
         return $this->belongsTo(\App\Models\Organisation::class);
+    }
+
+    public static function orgConfig(): ?array
+    {
+        return Arr::collapse(self::where('organisation_id', \Auth::user()->organisation_id)->pluck('values')->toArray());
     }
 }

@@ -66,8 +66,6 @@ export default function UserCreateOrEdit({auth, statuses}) {
     
   // Run this logic when 'mounted'
   useEffect(() => {
-    // 
-    console.log(auth?.user?.organisation_id);
     if(isSuper()) {
       axios.get('/api/organisations').then(response => {
         const mapped = response?.data?.map(org => {

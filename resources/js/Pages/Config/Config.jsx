@@ -11,9 +11,32 @@ import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
+import Select from 'react-select';
+import axios from 'axios';
+import { useUser } from '@/Flow/useUser';
 
-export default function Config({ config }) {
+export default function Config({ auth, config }) {
+    const { userHasRole } = useUser(auth?.user);
     const [createSetting, setCreateSetting] = useState(false);
+    const [organisations, setOrganisations] = useState([]);
+
+    /**
+     * 
+     */
+    const getOrganisations = () => {
+        axios.get(route('api.organisations')).then(response => {
+            // 
+            if(response.status == 200) {
+                setOrganisations([]);
+                setOrganisations(response?.data?.map(org => {
+                  return {value: org?.id, label: org?.name}
+                }));
+                setData({...data, ...{organisation_id: auth?.user?.organisation_id}})
+            }
+        }).catch(error => {
+            console.error(error);
+        });
+    }
     
     // Closes the modal
     const closeModal = () => {
@@ -34,6 +57,7 @@ export default function Config({ config }) {
     } = useForm({
         name: '',
         values: '',
+        organisation_id: auth?.user?.organisation_id || null
     });
 
     const postConfig = (e) => {
@@ -66,18 +90,41 @@ export default function Config({ config }) {
     /**
      * Column definitions for the 
      */
-    const configColumns = [
-        {
-            name: 'Name',
-            width: '25%',
-            selector: row => row.name
-        },
-        {
-            name: 'Values',
-            width: 'full',
-            selector: row => JSON.stringify(row.values)
-        },
-    ];
+    const configColumns = () => {
+        
+        return !userHasRole('super') ? [
+            {
+                name: 'Name',
+                width: '25%',
+                selector: row => row.name
+            },
+            {
+                name: 'Values',
+                selector: row => JSON.stringify(row.values)
+            },
+        ] : [
+            {
+                name: 'Name',
+                width: '25%',
+                selector: row => row.name
+            },
+            {
+                name: 'Organisation',
+                width: '25%',
+                selector: row => row?.organisation?.name || 'Unknown'
+            },
+            {
+                name: 'Values',
+                selector: row => JSON.stringify(row.values)
+            },
+        ]
+    };
+
+    useEffect(() => {
+    //   if(userHasRole('super')) {
+        getOrganisations();
+    //   }
+    }, [userHasRole('super')]);
 
     return (
         <AuthenticatedLayout>
@@ -88,7 +135,7 @@ export default function Config({ config }) {
                         <div className="overflow-hidden shadow-sm sm:rounded-lg dark:bg-gray-800">
                             <TableView
                                 data={config}
-                                columns={configColumns}
+                                columns={configColumns()}
                                 customStyles={customStyles}
                                 className='rounded-lg'
                             />
@@ -97,7 +144,7 @@ export default function Config({ config }) {
                 </div>
 
                 {/* Lets users add a new setting */}
-                <FloatingButton className="bg-gray-800" callback={() => {setCreateSetting(true)}} />
+                <FloatingButton className="bg-gray-800" onClick={() => {setCreateSetting(true)}} />
             </>
 
             {/* Create a new setting modal */}
@@ -107,6 +154,33 @@ export default function Config({ config }) {
                         Add New Config
                     </h2>
 
+                    {/* Organisation (if super) */}
+                    {auth && userHasRole('super') && (
+                        <div className="mt-6">
+                          <InputLabel
+                            htmlFor="organisation_id"
+                            value="Organisation"
+                            className=""
+                          />
+                          <Select
+                            id='organisation_id'
+                            name='organisation_id'
+                            options={organisations}
+                            onChange={(e) => {
+                                setData({...data, organisation_id: e.value})
+                            }}
+                            placeholder='Please select an Organisation'
+                            menuPlacement='top'
+                            value={organisations.find(o => o.value == data.organisation_id || auth?.user?.organisation_id)}
+                            className='border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600'
+                          />
+                          {errors && errors.status_id && <InputError
+                            message={errors.status_id}
+                            className="mt-2"
+                          />}
+                        </div>
+                    )}
+                    
                     {/* User name field */}
                     <div className="mt-6">
                         <InputLabel

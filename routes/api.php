@@ -12,6 +12,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
 
+    // Return the auth'd user.
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    /**
+     * Return statuses
+     */
     Route::get('statuses', function (Request $request) {
         $query = \App\Models\Status::query();
         $query->where('organisation_id', function ($sub) {
@@ -47,13 +55,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     /**
-     *
+     * Return the organisations, this route only works for super admins
      */
-    Route::get('/organisations', function (Request $request) {
-        if (!$request->user()->hasRole('super')) {
-            abort(404, 'Unauthorised');
-        }
-
+    Route::middleware(['role:super'])->get('/organisations', function (Request $request) {
         return \App\Models\Organisation::get(['id', 'name']);
+    })->name('api.organisations');
+
+    Route::get('config', function (Request $request) {
+        return response()->json([
+            'disciplines' => \App\Flow\Config::getConfigValue('disciplines') ?? false
+        ]);
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Config;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\StoreConfigRequest;
@@ -83,9 +84,9 @@ class ConfigController extends Controller
     private function getConfig(): ?array
     {
         if (auth()->user()->hasRole('super')) {
-            return Config::all()->toArray();
+            return Config::with('organisation')->get()->toArray();
         } else {
-            return auth()->user()->organisation->config->toArray();
+            return auth()->user()->organisation->config()->toArray();
         }
     }
 }

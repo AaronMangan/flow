@@ -36,6 +36,7 @@ class User extends Authenticatable
         'organisation_id',
         'status_id'
     ];
+    protected $with = ['organisation'];
 
     /**
      * The attributes that should be hidden for serialization.
