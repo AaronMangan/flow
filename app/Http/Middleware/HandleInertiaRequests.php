@@ -30,9 +30,16 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        /**
+         * Include the authenticated user with each request
+         */
         if (isset($request->user()->id)) {
-            $user = \App\Models\User::with(['roles', 'organisation'])->find($request->user()->id);
+            $user = \App\Models\User::with(['roles', 'organisation'])
+                ->find($request->user()->id)
+                ->setAppends(['config'])
+                ->toArray();
         }
+
         return [
             ...parent::share($request),
             'auth' => [

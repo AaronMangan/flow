@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/config', [ConfigController::class, 'index'])->middleware(['role:super|admin'])->name('config.index');
     Route::post('/config', [ConfigController::class, 'store'])->middleware(['role:super|admin'])->name('config.store');
+    Route::post('/config/{config}/update', [ConfigController::class, 'update'])->middleware(['role:super|admin'])->name('config.update');
 });
 
 /**
@@ -72,6 +73,16 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::post('/status', [\App\Http\Controllers\DocumentStatusController::class, 'store'])->name('status.create');
     Route::post('/status/{status}/update', [\App\Http\Controllers\DocumentStatusController::class, 'update'])->name('status.update');
     Route::delete('/status/{status}/delete', [\App\Http\Controllers\DocumentStatusController::class, 'destroy'])->name('status.destroy');
+});
+
+/**
+ * Discipline Routes
+ */
+Route::middleware(['role:super|admin', 'auth', 'discipline'])->group(function () {
+    Route::get('/disciplines', [\App\Http\Controllers\DisciplineController::class, 'index'])->name('disciplines');
+    Route::post('/discipline', [\App\Http\Controllers\DisciplineController::class, 'store'])->name('discipline.create');
+    Route::post('/discipline/{discipline}/update', [\App\Http\Controllers\DisciplineController::class, 'update'])->name('discipline.update');
+    Route::delete('/discipline/{discipline}/delete', [\App\Http\Controllers\DisciplineController::class, 'destroy'])->name('discipline.destroy');
 });
 
 // Add auth routes.

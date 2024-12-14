@@ -14,11 +14,21 @@ import { toast } from 'react-toastify';
 import Select from 'react-select';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
+import Tooltip from '@/Components/Tooltip';
+import Notification from '@/Components/Notification';
 
 export default function Config({ auth, config }) {
     const { userHasRole } = useUser(auth?.user);
     const [createSetting, setCreateSetting] = useState(false);
     const [organisations, setOrganisations] = useState([]);
+    const [updateWarning, setUpdateWarning] = useState(false);
+    const [activeConfig, setActiveConfig] = useState(() => {
+        return {
+            name: '',
+            values: '',
+            organisation_id: auth?.user?.organisation_id || null
+        }
+    })
 
     /**
      * 
@@ -62,16 +72,50 @@ export default function Config({ auth, config }) {
 
     const postConfig = (e) => {
         e.preventDefault();
-        post(route('config.store'), {
+        // If the config has an id, then we want to update, not create.
+        if(activeConfig?.id && activeConfig?.id > 0) {
+            post(route('config.update', {config: activeConfig?.id}), {
+                onSuccess: () => {
+                  toast.success('Config was updated successfully');
+                  setActiveConfig(null);
+                  closeModal();
+                  refreshData();
+                  setUpdateWarning(true);
+                },
+                onError: () => {
+                  toast.error('An error has occurred, please contact your administrator');
+                  setActiveConfig(null);
+                  closeModal();
+                  refreshData();
+                },
+                onFinish: () => reset(),
+            })
+        } else {
+          post(route('config.store'), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success("Config was saved successfully!");
-                closeModal();
+              toast.success("Config was saved successfully!");
+              setActiveConfig(null);
+              closeModal();
+              refreshData();
+              setUpdateWarning(true);
             },
             onError: () => null,
             onFinish: () => reset(),
-        });
+          });
+        }
+
     };
+
+    /**
+     * Reloads the data without reloading the page.
+     */
+    const refreshData = () => {
+      router.visit(route('config'), {
+        only: ['config'],
+        preserveState: true,
+      })
+    }
 
     /**
      * Custom Styles for the table headers
@@ -106,7 +150,20 @@ export default function Config({ auth, config }) {
             {
                 name: 'Name',
                 width: '25%',
-                selector: row => row.name
+                cell: (row) => {
+                  return (
+                    <Tooltip text="Click to Edit Config">
+                      <span 
+                        className="underline cursor-pointer" 
+                        onClick={(e) => {
+                          setUpdateWarning(true);
+                          setActiveConfig(null);
+                          setActiveConfig(row);
+                          editSettings(row);
+                        }}>{row?.name}</span>
+                    </Tooltip>
+                  );
+                },
             },
             {
                 name: 'Organisation',
@@ -120,10 +177,25 @@ export default function Config({ auth, config }) {
         ]
     };
 
+    /**
+     * Handle editing an organisations settings.
+     */
+    const editSettings = (row) => {
+        if(row?.id) {
+            setData(null);
+            setData({
+                name: row?.name || '',
+                values: JSON.stringify(row?.values) || '',
+                organisation_id: !userHasRole('super') ? auth?.user?.organisation_id : row?.organisation_id
+            })
+        }
+        setCreateSetting(true);
+    }
+
     useEffect(() => {
-    //   if(userHasRole('super')) {
+      if(userHasRole('super')) {
         getOrganisations();
-    //   }
+      }
     }, [userHasRole('super')]);
 
     return (
@@ -131,6 +203,11 @@ export default function Config({ auth, config }) {
             <Head title="Configuration Settings" />
             <>
                 <div className="py-12">
+                    {updateWarning && (
+                      <div className="w-3/4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        <Notification type='info' message='Some configuration settings will not update until next login.' />
+                      </div>
+                    )}
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                         <div className="overflow-hidden shadow-sm sm:rounded-lg dark:bg-gray-800">
                             <TableView

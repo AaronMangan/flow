@@ -10,7 +10,8 @@ import {
   XMarkIcon,
   ClipboardDocumentListIcon,
   DocumentCheckIcon,
-  ArchiveBoxIcon
+  ArchiveBoxIcon,
+  CubeIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
@@ -24,7 +25,6 @@ const Sidebar = ({ user }) => {
   const [collapsed, setCollapsed] = useState(true);
   const [openItem, setOpenItem] = useState(null);
   const { userHasRole } = useUser(user)
-  
   /**
    * Menu Items.
    */
@@ -46,17 +46,19 @@ const Sidebar = ({ user }) => {
           name: 'Users',
           icon: <UserGroupIcon className="w-7 h-7" />,
           path: '/users',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
         },
         {
           name: 'Config',
           icon: <WrenchScrewdriverIcon className="w-7 h-7" />,
           path: '/config',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
         },
         {
           name: 'Activity',
           icon: <QueueListIcon className='w-7 h-7' />,
           path: '/activity-log',
-          children: []
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
         }
       ]
     },
@@ -69,12 +71,20 @@ const Sidebar = ({ user }) => {
         {
           name: 'Revisions',
           icon: <DocumentCheckIcon className='w-7 h-7' />,
-          path: '/revisions'
+          path: '/revisions',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
         },
         {
           name: 'Statuses',
           icon: <ArchiveBoxIcon className='w-7 h-7' />,
-          path: '/statuses'
+          path: '/statuses',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
+        },
+        {
+          name: 'Disciplines',
+          icon: <CubeIcon className='w-7 h-7' />,
+          path: '/disciplines',
+          visibility: () => ((userHasRole('admin') || userHasRole('super')) && user?.config?.disciplines),
         },
       ]
     }
@@ -164,14 +174,18 @@ const Sidebar = ({ user }) => {
                   {/* Handle sub-menu items (children) */}
                   {item.children.length > 0 && openItem === index && (
                     <ul className={`ml-6 ${collapsed ? 'hidden' : ''}`}>
-                      {item.children.map((subItem, subIndex) => (
-                        <li key={subIndex}>
-                          <div onClick={() => {handleItemClick(subItem, subIndex)}} className="flex items-center px-4 py-2 space-x-4 hover:bg-gray-600">
-                            <span className="w-7 h-7">{subItem.icon}</span>
-                            {!collapsed && <span>{subItem.name}</span>}
-                          </div>
-                        </li>
-                      ))}
+                      {item.children.map((subItem, subIndex) => {
+                        if(subItem?.visibility && subItem?.visibility()) {
+                          return (
+                            <li key={subIndex}>
+                              <div onClick={() => {handleItemClick(subItem, subIndex)}} className="flex items-center px-4 py-2 space-x-4 hover:bg-gray-600">
+                                <span className="w-7 h-7">{subItem.icon}</span>
+                                {!collapsed && <span>{subItem.name}</span>}
+                              </div>
+                            </li>
+                          )
+                        }
+                      })}
                     </ul>
                   )}
                 </li>

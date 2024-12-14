@@ -38,9 +38,4 @@ class Config extends Model
     {
         return $this->belongsTo(\App\Models\Organisation::class);
     }
-
-    public static function orgConfig(): ?array
-    {
-        return Arr::collapse(self::where('organisation_id', \Auth::user()->organisation_id)->pluck('values')->toArray());
-    }
 }

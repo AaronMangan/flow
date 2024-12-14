@@ -12,70 +12,65 @@ import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react'
 
-export default function ViewRevisions({ revisions }) {
-  const [showCreateRevision, setShowCreateRevision] = useState(false);
+export default function ViewDisciplines({ disciplines }) {
+  const [showCreateDiscipline, setShowCreateDiscipline] = useState(false);
   /**
    * Construct a form object.
    */
-  const { data, setData, post, processing, reset, errors, clearErrors } = useForm({ name: '', code: '', description: '', draft: false });
-  const [activeRevision, setActiveRevision] = useState({ data });
+  const { data, setData, post, processing, reset, errors, clearErrors } = useForm({ name: '', code: '', description: '' });
+  const [activeDiscipline, setActiveDiscipline] = useState({ data });
   
   /**
-   * Revision Table Columns
+   * Discipline Table Columns
    */
-  const revisionColumns = [
+  const disciplineColumns = [
     {
-        name: '#',
-        selector: row => row.id,
-        width: '5pc'
+      name: '#',
+      selector: row => row.id,
+      width: '5pc'
     },
     {
-        name: 'Name',
-        selector: row => row.name ?? null,
-        width: '10pc'
+      name: 'Name',
+      selector: row => row.name ?? null,
+      width: '10pc'
     },
     {
-        name: 'Code',
-        selector: row => row.code,
-        width: '10pc',
+      name: 'Code',
+      selector: row => row.code,
+      width: '10pc',
     },
     {
-        name: 'Description',
-        selector: row => row.description,
-        width: 'full',
+      name: 'Description',
+      selector: row => row.description,
+      width: 'full',
     },
     {
-        name: 'For Drafts',
-        selector: row => row.draft ? 'Yes' : 'No',
-        width: '15pc'
-    },
-    {
-        name: 'Actions',
-        cell: (row) => {
-            return (
-                <>
-                <PrimaryButton
-                    id={'edit_' + row?.id}
-                    onClick={(e) => {
-                        setActiveRevision(null);
-                        setActiveRevision({...row, ...{draft: row.draft == 'Yes' ? true : false}})
-                        setShowCreateRevision(true);
-                    }}
-                    className='mr-2'
-                >Edit</PrimaryButton>
-                <DangerButton
-                  id={'delete_' + row?.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveRevision(null);
-                    setActiveRevision(row);
-                    deleteRevision(row.id);
-                  }}
-                >Delete</DangerButton>
-                </>
-            );
-        },
-        width: '20pc'
+      name: 'Actions',
+      cell: (row) => {
+        return (
+          <>
+            <PrimaryButton
+                id={'edit_' + row?.id}
+                onClick={(e) => {
+                    setActiveDiscipline(null);
+                    setActiveDiscipline({...row, ...{draft: row.draft == 'Yes' ? true : false}})
+                    setShowCreateDiscipline(true);
+                }}
+                className='mr-2'
+            >Edit</PrimaryButton>
+            <DangerButton
+              id={'delete_' + row?.id}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveDiscipline(null);
+                setActiveDiscipline(row);
+                deleteDiscipline(row.id);
+              }}
+            >Delete</DangerButton>
+          </>
+        );
+      },
+      width: '20pc'
     }
   ];
 
@@ -115,13 +110,6 @@ export default function ViewRevisions({ revisions }) {
       placeholder: '[Optional] Description...',
       className: 'w-full m-2',
       rows: 5
-    },
-    {
-      id: 'draft',
-      type: 'checkbox',
-      label: 'Draft Revision',
-      className: 'w-1/2 mx-2 rounded',
-      placeholder: null
     }
   ];
 
@@ -138,34 +126,34 @@ export default function ViewRevisions({ revisions }) {
    * Close Modal
    */
   const closeModal = () => {
-    setShowCreateRevision(false);
-    setActiveRevision(null);
-    setActiveRevision({ name: '', code: '', description: '', draft: false })
+    setActiveDiscipline(null);
+    setActiveDiscipline({ name: '', code: '', description: '' })
+    setShowCreateDiscipline(false);
   }
 
   /**
-   * Save the revision
+   * Save the discipline
    * @param {*} e 
    */
-  const postRevision = (e) => {
+  const postDiscipline = (e) => {
     e.preventDefault();
-    if(activeRevision?.id) {
-        post(route('revision.update', {revision: activeRevision}), {
+    if(activeDiscipline?.id) {
+        post(route('discipline.update', {discipline: activeDiscipline}), {
             onSuccess: () => {
-                toast.success('Revision updated successfully');
-                setShowCreateRevision(false);
-                setActiveRevision(null);
+                toast.success('Discipline updated successfully');
+                setShowCreateDiscipline(false);
+                setActiveDiscipline(null);
             },
             onError: () => {
                 toast.error('An error occurred, please contact your administrator');
             },
         });
     } else {
-      post(route('revision.create'), {
+      post(route('discipline.create'), {
         onSuccess: () => {
-          toast.success('Revision created successfully!');
-          setActiveRevision(null);
-          setShowCreateRevision(false);
+          toast.success('Discipline created successfully!');
+          setActiveDiscipline(null);
+          setShowCreateDiscipline(false);
         },
         onError: () => {
             toast.error('An error occurred, please contact your administrator for assistance');
@@ -174,31 +162,31 @@ export default function ViewRevisions({ revisions }) {
     }
   }
 
-  const deleteRevision = (id) => {
-    axios.delete(route('revision.destroy', {revision: id})).then((response) => {
+  const deleteDiscipline = (id) => {
+    axios.delete(route('discipline.destroy', {discipline: id})).then((response) => {
         if(response?.status == 200) {
-            toast.success('Revision deleted successfully');
+            toast.success('Discipline deleted successfully');
             reset();
-            router.visit(route('revisions'), {
-                only: ['revisions'],
+            router.visit(route('disciplines'), {
+              only: ['disciplines'],
             })
         } else {
-            toast.error('Unable to delete the revision. Please check you have access or contact your administrator');
+            toast.error('Unable to delete the discipline. Please check you have access or contact your administrator');
         }
     })
   }
 
   return (
     <AuthenticatedLayout>
-    <Head title="Configuration Settings" />
+    <Head title="Disciplines" />
       <>
         <div className="py-12">
           <div className="w-full mx-auto sm:px-6 lg:px-8">
             <div className="overflow-hidden sm:rounded-lg dark:bg-gray-800">
-              {revisions && (
+              {disciplines && (
                 <TableView
-                  data={revisions}
-                  columns={revisionColumns}
+                  data={disciplines}
+                  columns={disciplineColumns}
                   customStyles={customStyles}
                   className='rounded-lg'
                 />
@@ -209,21 +197,21 @@ export default function ViewRevisions({ revisions }) {
 
         {/* Lets users add a new setting */}
         <FloatingButton className="bg-gray-800" onClick={
-            () => {setShowCreateRevision(true)}
+            () => {setShowCreateDiscipline(true)}
         }/>
       </>
 
       {/* Create a new setting modal */}
-      <Modal show={showCreateRevision} onClose={closeModal}>
-        <form onSubmit={(e) => {postRevision(e)}} className="p-4">
+      <Modal show={showCreateDiscipline} onClose={closeModal}>
+        <form onSubmit={(e) => {postDiscipline(e)}} className="p-4">
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Add New Revision
+            Add New Discipline
           </h2>
           <FormGenerator
             className='w-full'
             config={formObj}
             valuesCallback={updateFormData}
-            values={activeRevision}
+            values={activeDiscipline}
             errors={errors}
           />
 

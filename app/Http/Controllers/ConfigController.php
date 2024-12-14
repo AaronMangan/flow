@@ -33,14 +33,13 @@ class ConfigController extends Controller
      */
     public function store(StoreConfigRequest $request)
     {
-        $data = $request->safe()->only(['name', 'values']);
+        $data = $request->safe()->only(['name', 'values', 'organisation_id']);
         $data['organisation_id'] = \Auth::user()->organisation_id;
         $data['values'] = json_decode($data['values']);
         $created = Config::create($data);
 
         return Inertia::render('Config/Config', [
             'config' => $this->getConfig(),
-            'status' => 'success'
         ]);
     }
 
@@ -63,9 +62,26 @@ class ConfigController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Config $config)
+    public function update(StoreConfigRequest $request, Config $config)
     {
-        //
+        // Authorise the action.
+        if ($request->user()->cannot('update', Config::class)) {
+            abort(403);
+        }
+
+        // Save the validated data.
+        $data = $request->safe()->only(['name', 'values', 'organisation_id']);
+
+        // Decode the JSON.
+        $data['values'] = json_decode($data['values']);
+
+        // Save the data.
+        $updated = $config->update($data);
+
+        // Return the response.
+        return Inertia::render('Config/Config', [
+            'config' => $this->getConfig()
+        ]);
     }
 
     /**

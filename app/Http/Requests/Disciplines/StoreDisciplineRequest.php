@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Disciplines;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreConfigRequest extends FormRequest
+class StoreDisciplineRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return \Auth::user()->hasAnyRole(['super', 'admin']) ?? false;
+        return \Auth::user()->hasAnyRole(['admin', 'super']);
     }
 
     /**
@@ -23,14 +23,14 @@ class StoreConfigRequest extends FormRequest
     {
         return [
             'name' => [
-                'string', 'required', 'max:255'
+                'string', 'max:255', 'required',
             ],
-            'values' => [
-                'json'
+            'code' => [
+                'string', 'max:255', 'required',
             ],
-            'organisation_id' => [
-                'numeric', 'nullable', 'exists:organisations,id'
-            ]
+            'description' => [
+                'string', 'max:255', 'nullable',
+            ],
         ];
     }
 }

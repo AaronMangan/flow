@@ -139,6 +139,8 @@ export default function ViewDocumentStatuses({ statuses }) {
    */
   const closeModal = () => {
     setShowCreateStatus(false);
+    setActiveStatus(null);
+    setActiveStatus({ name: '', code: '', description: '', draft: false });
   }
 
   /**

@@ -24,7 +24,7 @@ class Config
 
         // Pull the config records for the org.
         // This will collapse all separate arrays into one.
-        $configs = \App\Models\Config::orgConfig();
+        $configs = self::orgConfig();
 
         // Check, using dot notation, that a config key exists.
         if (Arr::hasAny($configs, $key)) {
@@ -33,5 +33,18 @@ class Config
 
         // If not found, return false.
         return false;
+    }
+
+    public static function orgConfig(): array
+    {
+        if (!\Auth::check()) {
+            throw new \Exception('User not authenticated', 404);
+        }
+
+        // Get user organisation id.
+        $org_id = \Auth::user()->organisation_id ?? false;
+
+        // This will collapse all separate arrays into one.
+        return Arr::collapse(\Auth::user()->organisation->config()->pluck('values')->toArray()) ?? [];
     }
 }
