@@ -10,11 +10,9 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('disciplines', function (Blueprint $table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('code');
-            $table->string('description')->nullable();
+            $table->string('name', 255);
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('organisation_id')->constrained('organisations');
             $table->softDeletes();
@@ -27,9 +25,9 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::table('disciplines', function (Blueprint $table) {
+        Schema::table('tags', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
-        Schema::dropIfExists('disciplines');
+        Schema::dropIfExists('tags');
     }
 };

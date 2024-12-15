@@ -105,5 +105,15 @@ Route::middleware(['role:super|admin', 'auth', 'config:areas'])->group(function 
     Route::delete('/area/{area}/delete', [\App\Http\Controllers\AreaController::class, 'destroy'])->name('area.destroy');
 });
 
+/**
+ * Tag Routes
+ */
+Route::middleware(['role:super|admin', 'auth', 'config:tags'])->group(function () {
+    Route::get('/tags', [\App\Http\Controllers\TagController::class, 'index'])->name('tags');
+    Route::post('/tags', [\App\Http\Controllers\TagController::class, 'store'])->name('tag.create');
+    Route::post('/tag/{tag}/update', [\App\Http\Controllers\AreaController::class, 'update'])->name('tag.update');
+    Route::delete('/tag/{tag}/delete', [\App\Http\Controllers\AreaController::class, 'destroy'])->name('tag.destroy');
+});
+
 // Add auth routes.
 require __DIR__.'/auth.php';

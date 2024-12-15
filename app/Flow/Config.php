@@ -35,6 +35,11 @@ class Config
         return false;
     }
 
+    /**
+     * Return the configuration data for an organisation.
+     *
+     * @return array
+     */
     public static function orgConfig(): array
     {
         if (!\Auth::check()) {
@@ -46,5 +51,39 @@ class Config
 
         // This will collapse all separate arrays into one.
         return Arr::collapse(\Auth::user()->organisation->config()->pluck('values')->toArray()) ?? [];
+    }
+
+    /**
+     * Populate a string with placeholders, using data from a supplied array.
+     * Returns false if the template string still contains placeholders afterwards.
+     *
+     * @param string $template
+     * @param array $data
+     * @return string|false
+     */
+    public static function replacePlaceholders(string $template, array $data): string|false
+    {
+        // Loop through each key in the $data array
+        foreach ($data as $key => $value) {
+            // Check to make sure there are no values that are null
+            if (!isset($value) || empty($value) || !Arr::isAssoc($data) || Arr::isList($data)) {
+                throw new \Exception('Placeholder population failed, please contact your administrator');
+            }
+
+            // Check if the placeholder exists in the template
+            if (preg_match('/\{' . preg_quote($key, '/') . '\}/', $template)) {
+                // Replace the placeholder with its corresponding value
+                $template = preg_replace('/\{' . preg_quote($key, '/') . '\}/', $value, $template);
+            }
+        }
+
+        // After all replacements, check if there are any remaining placeholders
+        if (preg_match('/\{[a-zA-Z0-9_]+\}/', $template)) {
+            // Return false if any placeholder still exists
+            return false;
+        }
+
+        // Return the fully replaced template.
+        return $template ?? false;
     }
 }
