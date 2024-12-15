@@ -10,7 +10,8 @@ import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
 import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
-import { router } from '@inertiajs/react'
+import { router } from '@inertiajs/react';
+import Tooltip from '@/Components/Tooltip';
 
 export default function ViewRevisions({ revisions }) {
   const [showCreateRevision, setShowCreateRevision] = useState(false);
@@ -36,7 +37,13 @@ export default function ViewRevisions({ revisions }) {
     },
     {
         name: 'Code',
-        selector: row => row.code,
+        cell: (row) => {
+            return (
+              <Tooltip text='Used when generating Document Numbers'>
+                <strong>{row?.code || 'N/A'}</strong>
+              </Tooltip>
+            );
+          },
         width: '10pc',
     },
     {

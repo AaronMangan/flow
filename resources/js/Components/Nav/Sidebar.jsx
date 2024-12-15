@@ -13,6 +13,7 @@ import {
   ArchiveBoxIcon,
   CubeIcon,
   CircleStackIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
@@ -65,7 +66,7 @@ const Sidebar = ({ user }) => {
     },
     {
       visibility: () => (userHasRole('admin') || userHasRole('super')),
-      name: 'Meta',
+      name: 'Metadata',
       icon: <ClipboardDocumentListIcon className='w-7 h-7' />,
       path: '',
       children: [
@@ -92,6 +93,12 @@ const Sidebar = ({ user }) => {
           icon: <CircleStackIcon className='w-7 h-7' />,
           path: '/types',
           visibility: () => ((userHasRole('admin') || userHasRole('super')) && user?.config?.types),
+        },
+        {
+          name: 'Area',
+          icon: <GlobeAltIcon className='w-7 h-7' />,
+          path: '/areas',
+          visibility: () => ((userHasRole('admin') || userHasRole('super')) && user?.config?.areas),
         },
       ]
     }

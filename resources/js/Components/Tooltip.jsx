@@ -14,7 +14,7 @@ export default function Tooltip ({ text, children }) {
 
     return (
         <div 
-            className="tooltip-container" 
+            className="w-[100vw] tooltip-container" 
             onMouseEnter={handleMouseEnter} 
             onMouseLeave={handleMouseLeave}
             style={{ position: 'relative', display: 'inline-block' }}
@@ -22,7 +22,7 @@ export default function Tooltip ({ text, children }) {
             {children}
             {visible && (
                 <div 
-                    className="w-full tooltip max-w-auto" 
+                    className="tooltip" 
                     style={{
                         position: 'absolute',
                         bottom: '100%',
@@ -33,7 +33,9 @@ export default function Tooltip ({ text, children }) {
                         padding: '8px',
                         borderRadius: '4px',
                         fontSize: '12px',
-                        zIndex: 1000,
+                        zIndex: 1100,
+                        maxWidth: '1000px',
+                        minWidth: '250px'
                     }}
                 >
                     {text}

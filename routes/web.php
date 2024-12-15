@@ -78,7 +78,7 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
 /**
  * Discipline Routes
  */
-Route::middleware(['role:super|admin', 'auth', 'discipline'])->group(function () {
+Route::middleware(['role:super|admin', 'auth', 'config:disciplines'])->group(function () {
     Route::get('/disciplines', [\App\Http\Controllers\DisciplineController::class, 'index'])->name('disciplines');
     Route::post('/discipline', [\App\Http\Controllers\DisciplineController::class, 'store'])->name('discipline.create');
     Route::post('/discipline/{discipline}/update', [\App\Http\Controllers\DisciplineController::class, 'update'])->name('discipline.update');
@@ -88,11 +88,21 @@ Route::middleware(['role:super|admin', 'auth', 'discipline'])->group(function ()
 /**
  * Type Routes
  */
-Route::middleware(['role:super|admin', 'auth', 'type'])->group(function () {
+Route::middleware(['role:super|admin', 'auth', 'config:types'])->group(function () {
     Route::get('/types', [\App\Http\Controllers\TypeController::class, 'index'])->name('types');
     Route::post('/type', [\App\Http\Controllers\TypeController::class, 'store'])->name('type.create');
     Route::post('/type/{type}/update', [\App\Http\Controllers\TypeController::class, 'update'])->name('type.update');
     Route::delete('/type/{type}/delete', [\App\Http\Controllers\TypeController::class, 'destroy'])->name('type.destroy');
+});
+
+/**
+ * Area Routes
+ */
+Route::middleware(['role:super|admin', 'auth', 'config:areas'])->group(function () {
+    Route::get('/areas', [\App\Http\Controllers\AreaController::class, 'index'])->name('areas');
+    Route::post('/area', [\App\Http\Controllers\AreaController::class, 'store'])->name('area.create');
+    Route::post('/area/{area}/update', [\App\Http\Controllers\AreaController::class, 'update'])->name('area.update');
+    Route::delete('/area/{area}/delete', [\App\Http\Controllers\AreaController::class, 'destroy'])->name('area.destroy');
 });
 
 // Add auth routes.

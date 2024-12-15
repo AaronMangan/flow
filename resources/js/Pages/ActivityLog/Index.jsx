@@ -6,10 +6,11 @@ import dayjs from 'dayjs';
 import { Inertia } from '@inertiajs/inertia';
 import FilterBar from '@/Components/FilterBar';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { router } from '@inertiajs/react'
 
 export default function Dashboard({ history, filters }) {
   const { data, current_page, last_page } = history;
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(current_page);
   const [filterValues, setFilterValues] = useState({});
   const [hasMounted, setHasMounted] = useState(false);
   
@@ -72,38 +73,46 @@ export default function Dashboard({ history, filters }) {
    */
   const valuesCallback = (values) => {
     if(hasMounted && filterValues !== values) {
-        handlePageChange(currentPage, values);
+      setFilterValues(null);
+      setFilterValues(values);
+      handlePageChange();
     }
   }
 
   const filterOptions = [
     {
-        id: 'model',
-        type: 'select',
-        label: 'Model',
-        endpoint: '/api/filters/models',
-        className: 'w-[200px]',
-        default: 'all'
+      id: 'model',
+      type: 'select',
+      label: 'Model',
+      endpoint: '/api/filters/models',
+      className: 'w-[200px]',
+      default: 'all'
     },
     {
-        id: 'search',
-        type: 'text',
-        label: 'Search',
-        className: 'w-[300px]',
-        placeholder: 'Enter search'
+      id: 'search',
+      type: 'text',
+      label: 'Search',
+      className: 'w-[300px]',
+      placeholder: 'Enter search'
     },
   ];
 
-  const handlePageChange = (page, values = null) => {
-    Inertia.get(`/activity-log?page=${page}`, values || filterValues, { preserveState: true });
+  const handlePageChange = () => {
+    router.visit(route('activity-log', {page: currentPage, ...filterValues}), { only: ['history'], preserveState: true })
   };
+
+  const changePage = (page) => {
+    setCurrentPage(null);
+    setCurrentPage(page);
+  }
 
   useEffect(() => {
     if (hasMounted) {
-        // Add any mounted activities here.
+      // Add any mounted activities here.
+      router.visit(route('activity-log', {page: currentPage, ...filterValues}), { only: ['history', 'filters'] })
     } else {
-        // Set the mounted flag to true after the initial render
-        setHasMounted(true);
+      // Set the mounted flag to true after the initial render
+      setHasMounted(true);
     }
   }, [currentPage, filterValues]);
 
@@ -125,7 +134,12 @@ export default function Dashboard({ history, filters }) {
               {/* Pagination controls */}
               <div className="flex justify-center p-2 mt-4">
                 <PrimaryButton
-                  onClick={() => handlePageChange(current_page - 1)}
+                  onClick={
+                    (e) => {
+                      e.preventDefault();
+                      changePage(current_page - 1)
+                    }
+                  }
                   disabled={current_page === 1}
                   className="px-4 py-2 text-gray-700 bg-gray-300 rounded-l-md hover:bg-gray-400 disabled:opacity-50"
                 >Previous</PrimaryButton>
@@ -133,7 +147,12 @@ export default function Dashboard({ history, filters }) {
                 {/* Page numbers */}
                 <span className="flex items-center px-4 py-2">{current_page} of {last_page}</span>
                 <PrimaryButton
-                    onClick={() => handlePageChange(current_page + 1, filterValues)}
+                    onClick={
+                      (e) => {
+                        e.preventDefault();
+                        changePage(current_page + 1)
+                      }
+                    }
                     disabled={current_page === last_page}
                     className="px-4 py-2 text-gray-700 bg-gray-300 rounded-r-md hover:bg-gray-400 disabled:opacity-50"
                 >Next</PrimaryButton>

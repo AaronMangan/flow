@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Discipline;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Http\Requests\Disciplines\StoreDisciplineRequest;
+use App\Http\Requests\Areas\StoreAreaRequest;
 
-class DisciplineController extends Controller
+class AreaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +17,8 @@ class DisciplineController extends Controller
         /**
          * Return the rendered view.
          */
-        return Inertia::render('Meta/ViewDisciplines', [
-            'disciplines' => $this->getDisciplines()
+        return Inertia::render('Meta/ViewAreas', [
+            'areas' => $this->getAreas()
         ]);
     }
 
@@ -33,19 +33,23 @@ class DisciplineController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeDisciplineRequest $request)
+    public function store(StoreAreaRequest $request)
     {
         // Get the data
         $data = $request->safe()->only(['name', 'code', 'description']);
         $data['user_id'] = $request->user()->id;
         $data['organisation_id'] = $request->user()->organisation_id;
-        $discipline = Discipline::create($data);
+        $area = Area::create($data);
+
+        return Inertia::render('Meta/ViewAreas', [
+            'areas' => $this->getAreas()
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Discipline $discipline)
+    public function show(Area $area)
     {
         //
     }
@@ -53,7 +57,7 @@ class DisciplineController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Discipline $discipline)
+    public function edit(Area $area)
     {
         //
 
@@ -62,37 +66,37 @@ class DisciplineController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreDisciplineRequest $request, Discipline $discipline)
+    public function update(StoreAreaRequest $request, Area $area)
     {
         // Get the data.
         $data = $request->safe()->only(['name', 'code', 'description', 'draft']);
 
         // Update the status
-        $result = $discipline->update($data);
+        $result = $area->update($data);
 
-        return Inertia::render('Meta/ViewDisciplines', [
-            'statuses' => $this->getDisciplines()
+        return Inertia::render('Meta/ViewAreas', [
+            'areas' => $this->getAreas()
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Discipline $discipline)
+    public function destroy(Request $request, Area $area)
     {
         if (!$request->user()->hasAnyRole(['super', 'admin'])) {
             abort(401, 'Unauthorised');
         }
 
         // Otherwise, delete the discipline.
-        $discipline->delete();
+        $area->delete();
 
-        return response('Discipline deleted successfully', 200);
+        return response('Area deleted successfully', 200);
     }
 
-    private function getDisciplines(): array
+    private function getAreas(): array
     {
-        $query = Discipline::query();
+        $query = Area::query();
 
         if (\Auth::user()->hasRole('super')) {
             return $query->get()->toArray();

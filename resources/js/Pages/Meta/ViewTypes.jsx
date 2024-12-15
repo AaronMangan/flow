@@ -10,13 +10,11 @@ import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
 import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
-import { router } from '@inertiajs/react'
+import { router } from '@inertiajs/react';
+import Tooltip from '@/Components/Tooltip';
 
 export default function ViewTypes({ types }) {
   const [showCreateType, setShowCreateType] = useState(false);
-  /**
-   * Construct a form object.
-   */
   const { data, setData, post, processing, reset, errors, clearErrors } = useForm({ name: '', code: '', description: '' });
   const [activeType, setActiveType] = useState({ data });
   
@@ -36,7 +34,13 @@ export default function ViewTypes({ types }) {
     },
     {
       name: 'Code',
-      selector: row => row.code,
+      cell: (row) => {
+        return (
+          <Tooltip text='Used when generating Document Numbers'>
+            <strong>{row?.code || 'N/A'}</strong>
+          </Tooltip>
+        );
+      },
       width: '10pc',
     },
     {

@@ -61,9 +61,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return \App\Models\Organisation::get(['id', 'name']);
     })->name('api.organisations');
 
-    Route::get('config', function (Request $request) {
-        return response()->json([
-            'disciplines' => \App\Flow\Config::getConfigValue('disciplines') ?? false
-        ]);
-    });
+    // Route::get('config', function (Request $request) {
+    //     return response()->json([
+    //         'disciplines' => \App\Flow\Config::getConfigValue('disciplines') ?? false
+    //     ]);
+    // });
 });
