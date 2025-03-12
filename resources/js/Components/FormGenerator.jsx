@@ -2,14 +2,7 @@ import React, { useEffect, useState } from 'react';
 import InputError from './InputError';
 
 export default function FormGenerator({ className, config, valuesCallback, values, errors, ...props }) {
-  const [apiData, setApiData] = useState({});
   const [formData, setFormData] = useState({})
-
-  useEffect(() => {
-    config && config.map((item) => {
-        makeApisCallForData(item);
-    });
-  }, [config]);
   
   // Set a default state for the form, or if there are values (e.g. editing a resource then populate those)
   useEffect(() => {
@@ -30,29 +23,15 @@ export default function FormGenerator({ className, config, valuesCallback, value
     }, 500);
   }, [formData])
 
-  /**
-   * Makes an api call for dropdown data.
-   */
-  const makeApisCallForData = (filterObj) => {
-    if(filterObj?.endpoint) {
-      axios.get(filterObj.endpoint).then(response => {
-        if (response?.data?.status && response?.data?.status == 'success') {
-          const api = response?.data?.data.map(item => {
-            return item;
-          })
-          setApiData({...apiData, [filterObj.id]: api});
-        }
-      })
-    };
-  };
-
-  const renderInput = (obj) => {
+  const renderInput = (obj, index) => {
     switch (obj.type) {
         case 'select':
+            console.log(obj.data)
           return (
-            <div key={obj.id} className="w-full pt-2">
-              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+            <div key={obj.id + '-parent'} className={obj.parentClassName}>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
               <select
+                key={obj.id + '_' + index}
                 id={obj.id}
                 value={formData[obj.id]}
                 onChange={(e) => {
@@ -60,20 +39,20 @@ export default function FormGenerator({ className, config, valuesCallback, value
                 }}
                 className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
               >
-                <option key='all' value="all">All</option>
+                <option key={'all_' + obj.id} value="all">All</option>
                 
                 {/* Dynamically populate the options. */}
-                {apiData && (
-                  apiData[obj.id]?.map(x => {
-                    return <option key={x.value} value={x.value}>{x.label}</option>;
+                {/* {obj.data && (
+                  obj.data?.forEach(x => {
+                    return <option key={obj.id + '_' + x.value} value={x.value}>{x.label}</option>;
                   })
-                )}
+                )} */}
               </select>
             </div>
           );
         case 'text':
           return (
-            <div key={obj.id} className="w-full pt-1 pr-4">
+            <div key={obj.id} className={obj.parentClassName}>
               <label htmlFor={obj.label} className="pl-2 text-sm font-bold text-gray-600">{obj.label}</label>
               <input
                 type="text"
@@ -86,6 +65,14 @@ export default function FormGenerator({ className, config, valuesCallback, value
                   setFormData({...formData, [obj.id]: e.target.value || ''});
                 }}
               />
+              <InputError className="px-2" message={errors[obj.id]} />
+            </div>
+          );
+        case 'label':
+          return (
+            <div key={obj.id} className={obj.parentClassName}>
+              <label htmlFor={obj.label} className="pl-2 text-sm font-bold text-gray-600">{obj.label}</label>
+              <span>{obj.value || ''}</span>
               <InputError className="px-2" message={errors[obj.id]} />
             </div>
           );

@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\DocumentStatus;
+use App\Models\Type;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class DocumentStatusPolicy
+class TypePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -15,14 +15,14 @@ class DocumentStatusPolicy
     {
         //
         return (\Auth::user()->hasAnyRole(['super', 'admin', 'user']))
-        ? Response::allow()
-        : Response::deny('Unauthorised Action');
+            ? Response::allow()
+            : Response::deny('Unauthorised Action');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, DocumentStatus $status): Response
+    public function view(User $user, Type $type): Response
     {
         // If the user is a super user.
         if (\Auth::user()->hasAnyRole(['super'])) {
@@ -42,7 +42,7 @@ class DocumentStatusPolicy
      */
     public function create(User $user): Response
     {
-        return \Auth::user()->hasAnyRole(['super', 'admin'])
+        return (\Auth::user()->hasAnyRole(['super', 'admin']))
             ? Response::allow()
             : Response::deny('Unauthorised Action');
     }
@@ -50,15 +50,23 @@ class DocumentStatusPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, DocumentStatus $status): Response
+    public function update(User $user, Type $type): Response
     {
-        //
+        // If the user is a super user, they can edit anything.
+        if ($user->hasRole('super')) {
+            return Response::allow();
+        }
+
+        // Otherwise the user must have an admin role and the model being deleted must be from the users organisation.
+        return ($user->hasRole('admin') && $user->organisation_id === $type->organisation_id)
+            ? Response::allow()
+            : Response::deny('Not authorised to complete this action');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, DocumentStatus $status): Response
+    public function delete(User $user, Type $type): Response
     {
         // Super role can delete any user.
         if ($user->hasRole('super')) {
@@ -66,7 +74,7 @@ class DocumentStatusPolicy
         }
 
         // Otherwise the user must have an admin role and the model being deleted must be from the users organisation.
-        return ($user->hasRole('admin') && $user->organisation_id === $status->organisation_id)
+        return ($user->hasRole('admin') && $user->organisation_id === $type->organisation_id)
             ? Response::allow()
             : Response::deny('Not authorised to complete this action');
     }
@@ -74,15 +82,23 @@ class DocumentStatusPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, DocumentStatus $status): Response
+    public function restore(User $user, Type $type): Response
     {
-        //
+        // Super role can delete any user.
+        if ($user->hasRole('super')) {
+            return Response::allow();
+        }
+
+        // Otherwise the user must have an admin role and the model being deleted must be from the users organisation.
+        return ($user->hasRole('admin') && $user->organisation_id === $type->organisation_id)
+            ? Response::allow()
+            : Response::deny('Not authorised to complete this action');
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, DocumentStatus $status): Response
+    public function forceDelete(User $user, Type $type): Response
     {
         //
     }

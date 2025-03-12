@@ -4,23 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // Authorise the action.
+        if ($request->user()->cannot('viewAny', Document::class)) {
+            abort(403);
+        }
+
+        // Return
+        return Inertia::render('Documents/DocumentIndex', [
+            'documents' => $this->getDocuments()
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        // Authorise the action.
+        if ($request->user()->cannot('create', Document::class)) {
+            abort(403);
+        }
+
+        // Return
+        return Inertia::render('Documents/DocumentCreateOrEdit');
     }
 
     /**
@@ -61,5 +76,22 @@ class DocumentController extends Controller
     public function destroy(Document $document)
     {
         //
+    }
+
+    /**
+     * Returns documents for the organisation.
+     *
+     * @return array
+     */
+    private function getDocuments(): array
+    {
+        $query = Document::query();
+
+        if (\Auth::user()->hasRole('super')) {
+            return $query->get()->toArray();
+        }
+
+        return $query->where('organisation_id', \Auth::user()->organisation_id)
+            ->get()->toArray() ?? [];
     }
 }

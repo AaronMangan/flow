@@ -17,22 +17,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
-    /**
-     * Return statuses
-     */
-    Route::get('statuses', function (Request $request) {
-        $query = \App\Models\Status::query();
-        $query->where('organisation_id', function ($sub) {
-            return $sub->where('organisation_id', null)
-                ->orWhere('organisation_id', auth()->user()->organisation_id);
-        });
-        // return response()->json($query->whereIn('organisation_id', [auth()->user()->organisation_id, null])->get()->toArray());
-        return response()->json([
-            'status' => 'success',
-            'data' => \App\Models\Status::all()
-        ], 200);
-    });
-
     // Filter Data API.
     Route::get('/filters/models', function (Request $request) {
         $modelNames = \App\Models\ActivityLog::where('organisation_id', $request->user()->organisation_id)
@@ -61,9 +45,182 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return \App\Models\Organisation::get(['id', 'name']);
     })->name('api.organisations');
 
-    // Route::get('config', function (Request $request) {
-    //     return response()->json([
-    //         'disciplines' => \App\Flow\Config::getConfigValue('disciplines') ?? false
-    //     ]);
-    // });
+    /**
+     * Return disciplines for the organisation
+     */
+    Route::middleware(['role:super|admin', 'config:disciplines'])->get('/disciplines', function (Request $request) {
+        //
+        $query = \App\Models\Discipline::query();
+
+        // Handle search if specified.
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        // For super users return everything.
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'code', 'name'])]);
+        }
+
+        // For admin return org disciplines
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'code', 'name'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+    })->name('api.disciplines');
+
+
+    /**
+     * Return types for the organisation
+     */
+    Route::middleware(['role:super|admin', 'config:types'])->get('/types', function (Request $request) {
+        // Confirm the user can make the request.
+        if ($request->user()->cannot('viewAny', \App\Models\Type::class)) {
+            abort(403);
+        }
+
+        $query = \App\Models\Type::query();
+
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'code', 'name'])]);
+        }
+
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'code', 'name'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+
+    })->name('api.types');
+
+    /**
+     * Return areas for the organisation
+     */
+    Route::middleware(['role:super|admin', 'config:areas'])->get('/areas', function (Request $request) {
+        // Confirm the user can make the request.
+        if ($request->user()->cannot('viewAny', \App\Models\Area::class)) {
+            abort(403);
+        }
+
+        $query = \App\Models\Area::query();
+
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'code', 'name'])]);
+        }
+
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'code', 'name'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+
+    })->name('api.areas');
+
+    /**
+     * Return statuses for the organisation
+     */
+    Route::middleware(['role:super|admin'])->get('/statuses', function (Request $request) {
+        // Confirm the user can make the request.
+        if ($request->user()->cannot('viewAny', \App\Models\DocumentStatus::class)) {
+            abort(403);
+        }
+
+        $query = \App\Models\DocumentStatus::query();
+
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'code', 'name'])]);
+        }
+
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'code', 'name'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+
+    })->name('api.statuses');
+
+    /**
+     * Return revisions for the organisation
+     */
+    Route::middleware(['role:super|admin'])->get('/revisions', function (Request $request) {
+        // Confirm the user can make the request.
+        if ($request->user()->cannot('viewAny', \App\Models\Revision::class)) {
+            abort(403);
+        }
+
+        $query = \App\Models\Revision::query();
+
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'name', 'code'])]);
+        }
+
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'name', 'code'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+
+    })->name('api.revisions');
+
+    /**
+     * Returns tags for orgs that use them
+     */
+    Route::middleware(['role:super|admin', 'config:tags'])->get('/tags', function (Request $request) {
+        // Confirm the user can make the request.
+        if ($request->user()->cannot('viewAny', \App\Models\Tag::class)) {
+            abort(403);
+        }
+
+        $query = \App\Models\Tag::query();
+
+        if ($request->has('search')) {
+            $search = $request->search ?? null;
+            $query->where(function ($q) use ($search) {
+                return $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->user()->hasRole('super')) {
+            return response()->json(['status' => 'success', 'data' => $query->get(['id', 'name'])]);
+        }
+
+        $data = $query->where('organisation_id', $request->user()->organisation_id)
+            ->get(['id', 'name'])
+            ->toArray();
+        return response()->json(['status' => 'success', 'data' => $data]);
+
+    })->name('api.tags');
 });

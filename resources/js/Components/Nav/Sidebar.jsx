@@ -15,6 +15,8 @@ import {
   CircleStackIcon,
   GlobeAltIcon,
   TagIcon,
+  DocumentIcon,
+  DocumentPlusIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
@@ -38,6 +40,26 @@ const Sidebar = ({ user }) => {
       icon: <HomeIcon className="w-7 h-7" />,
       path: '/dashboard',
       children: []
+    },
+    {
+      visibility: () => (userHasRole('admin') || userHasRole('super')),
+      name: 'Documents',
+      icon: <DocumentIcon className='w-7 h-7' />,
+      path: '',
+      children: [
+        {
+          name: 'Documents',
+          icon: <DocumentIcon className="w-7 h-7" />,
+          path: '/documents',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
+        },
+        {
+          name: 'New Document',
+          icon: <DocumentPlusIcon className="w-7 h-7" />,
+          path: '/documents/create',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
+        }
+      ],
     },
     {
       visibility: () => (userHasRole('admin') || userHasRole('super')),
