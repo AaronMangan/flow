@@ -20,6 +20,7 @@ import {
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
+import { router } from '@inertiajs/react';
 
 /**
  * Define the sidebar used for navigation.
@@ -145,7 +146,8 @@ const Sidebar = ({ user }) => {
 
   // Navigate to the profile page when clicked.
   const goToPath = (path) => {
-    window.location.href = path;
+    // window.location.href = path;
+    router.get(path)
     setCollapsed(true)
   }
 
@@ -155,7 +157,8 @@ const Sidebar = ({ user }) => {
     })
     .then(function (response) {
       // Handle successful logout response
-      window.location.href = '/login';   // Redirect to the homepage or login page
+      // window.location.href = '/login';   // Redirect to the homepage or login page
+      router.get('/login')
     })
     .catch(function (error) {
       // Handle any errors
