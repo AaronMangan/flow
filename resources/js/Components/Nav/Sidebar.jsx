@@ -136,6 +136,7 @@ const Sidebar = ({ user }) => {
 
   // Toggle the menu
   const toggleSubMenu = (index) => {
+    setCollapsed(false)
     setOpenItem(openItem === index ? null : index);  // Toggle the open/close of sub-items
   };
   
