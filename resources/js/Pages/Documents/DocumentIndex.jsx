@@ -2,7 +2,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
@@ -243,34 +242,34 @@ export default function ViewDocuments({ documents, messages }) {
       {/* Create a new setting modal */}
       <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
         <div className='px-4 py-4 overflow-y'>
-          <dl class="grid grid-cols-1 gap-x-8 gap-y-4">
+          <dl className="grid grid-cols-1 gap-x-8 gap-y-4">
             <div>
-              <dt class="font-bold text-gray-900">Document Number</dt>
-              <dd class="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
+              <dt className="font-bold text-gray-900">Document Number</dt>
+              <dd className="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Title</dt>
-              <dd class="text-gray-600">{activeDocument.name}</dd>
+              <dt className="font-bold text-gray-900">Title</dt>
+              <dd className="text-gray-600">{activeDocument.name}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Area</dt>
-              <dd class="text-gray-600">{activeDocument?.area?.name}</dd>
+              <dt className="font-bold text-gray-900">Area</dt>
+              <dd className="text-gray-600">{activeDocument?.area?.name}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Discipline</dt>
-              <dd class="text-gray-600">{activeDocument.discipline?.name}</dd>
+              <dt className="font-bold text-gray-900">Discipline</dt>
+              <dd className="text-gray-600">{activeDocument.discipline?.name}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Type</dt>
-              <dd class="text-gray-600">{activeDocument?.type?.name}</dd>
+              <dt className="font-bold text-gray-900">Type</dt>
+              <dd className="text-gray-600">{activeDocument?.type?.name}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Revision</dt>
-              <dd class="text-gray-600">{activeDocument?.revision?.code}</dd>
+              <dt className="font-bold text-gray-900">Revision</dt>
+              <dd className="text-gray-600">{activeDocument?.revision?.code}</dd>
             </div>
             <div>
-              <dt class="font-bold text-gray-900">Status</dt>
-              <dd class="text-gray-600">{activeDocument?.document_status?.name}</dd>
+              <dt className="font-bold text-gray-900">Status</dt>
+              <dd className="text-gray-600">{activeDocument?.document_status?.name}</dd>
             </div>
             <div className='text-right'>
               <PrimaryButton className="" onClick={closeModal}>

@@ -35,8 +35,8 @@ export default function DocumentCreateOrEdit ({ document, messages }) {
     }
 
     const resetForm = () => {
-        reset();
-        setData({});
+      reset();
+      setData({});
     }
 
     /**
@@ -129,9 +129,7 @@ export default function DocumentCreateOrEdit ({ document, messages }) {
     const submitForm = () => {
       if (!document || !document?.id) {
         post(route('document.create'), {
-          onSuccess: (req) => {
-            console.log(req);
-          }
+          onSuccess: (req) => {}
         });
       } else {
         post(route('document.update', document?.id), {
