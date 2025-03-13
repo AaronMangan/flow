@@ -24,10 +24,10 @@ class CreateNewDocumentRequest extends FormRequest
     {
         return [
             'area_id' => [
-                'exists:areas,id', 'numeric', 'required'
+                'numeric', 'required', 'exists:areas,id',
             ],
             'discipline_id' => [
-                'exists:disciplines,id', 'numeric', 'required'
+                'numeric', 'required', 'exists:disciplines,id',
             ],
             'is_placeholder' => [
                 'boolean', 'nullable'
@@ -36,16 +36,16 @@ class CreateNewDocumentRequest extends FormRequest
                 'string', 'required', 'max:255'
             ],
             'revision_id' => [
-                'exists:revisions,id', 'numeric', 'required'
+                'numeric', 'required', 'exists:revisions,id',
             ],
             'status_id' => [
-                'exists:statuses,id', 'numeric', 'required'
+                'numeric', 'required', 'exists:statuses,id',
             ],
             'tags' => [
                 'nullable'
             ],
             'type_id' => [
-                'exists:types,id', 'numeric', 'required'
+                'numeric', 'required', 'exists:types,id',
             ],
             'description' => [
                 'nullable', 'max:25000',
@@ -56,9 +56,9 @@ class CreateNewDocumentRequest extends FormRequest
     public function messages(): array
     {
         return [
+            '*.required' => ':attribute is required, please select one from the dropdown',
             '*.exists' => 'The selected :attribute could not be found, please reload the page and try again.',
             '*.numeric' => 'Please select an :attribute from the list.',
-            '*.required' => ':attribute is required, please select one from the dropdown',
         ];
     }
 }

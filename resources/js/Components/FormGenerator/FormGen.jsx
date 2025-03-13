@@ -54,7 +54,9 @@ export default function FormGen({ className, config, valuesCallback, values, err
               placeholder={obj.placeholder || 'Please select an option'}
               className={obj.className}
             />
+            {errors[obj?.id] && <p className="text-sm text-red-500">{errors[obj?.id]}</p>}
           </div>
+          
         );
       case 'multiselect':
         return (
@@ -71,6 +73,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
               className={'react-select-container ' + obj.className}
               classNamePrefix='react-select'
             />
+            <InputError className="px-2" message={errors[obj.id]} />
           </div>
         );
         case 'text':
@@ -164,6 +167,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 </div>
                 <span className="ml-3 text-xs font-medium text-gray-700">{formData[obj.id] ? 'On' : 'Off'}</span>
               </label>
+              <InputError className="px-2" message={errors[obj.id]} />
             </div>
           );
         default:
