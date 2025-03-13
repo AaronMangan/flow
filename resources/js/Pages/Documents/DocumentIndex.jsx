@@ -32,25 +32,13 @@ export default function ViewDocuments({ documents }) {
       width: '5pc'
     },
     {
+      name: 'Document Number',
+      selector: row => row.document_number,
+      width: '15pc',
+    },
+    {
       name: 'Name',
       selector: row => row.name ?? null,
-      width: '10pc'
-    },
-    {
-      name: 'Code',
-      cell: (row) => {
-        return (
-          <Tooltip text='Used when generating Document Numbers'>
-            <strong>{row?.code || 'N/A'}</strong>
-          </Tooltip>
-        );
-      },
-      width: '10pc',
-    },
-    {
-      name: 'Description',
-      selector: row => row.description,
-      width: 'full',
     },
     {
       name: 'Actions',
@@ -62,7 +50,7 @@ export default function ViewDocuments({ documents }) {
                 onClick={(e) => {
                     setActiveDocument(null);
                     setActiveDocument({...row, ...{draft: row.draft == 'Yes' ? true : false}})
-                    setShowCreateDocument(true);
+                    router.get(route('document.edit', row?.id))
                 }}
                 className='mr-2'
             >Edit</PrimaryButton>

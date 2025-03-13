@@ -8,13 +8,15 @@ import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function DocumentCreateOrEdit ({ document }) {
     const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
-        // name: document?.title || null,
-        // document_number: document?.document_number || null,
-        // type: document?.type_id || null,
-        // discipline: document?.discipline_id || null,
-        // area: document?.area_id || null,
-        // revision: document?.revision_id || null,
-        // status: document?.document_status_id || null
+        name: document?.name || null,
+        document_number: document?.document_number || null,
+        type_id: document?.type_id || null,
+        discipline_id: document?.discipline_id || null,
+        area_id: document?.area_id || null,
+        revision_id: document?.revision_id || null,
+        status_id: document?.document_status_id || null,
+        is_placeholder: document?.is_placeholder || false,
+        description: document?.description || null
     });
     const [disciplines, setDisciplines] = useState([]);
     const [types, setTypes] = useState([]);
@@ -22,6 +24,7 @@ export default function DocumentCreateOrEdit ({ document }) {
     const [statuses, setStatuses] = useState([]);
     const [revisions, setRevisions] = useState([]);
     const [tags, setTags] = useState([]);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     /**
      * Update the form data with the data from the form generator
@@ -124,12 +127,24 @@ export default function DocumentCreateOrEdit ({ document }) {
     }
 
     const submitForm = () => {
-        console.log(data);
+      if (!document || !document?.id) {
+        post(route('document.create'), {
+          onSuccess: (req) => {
+            console.log(req);
+          }
+        });
+      } else {
+        post(route('document.update', document?.id), {
+          onSuccess: (req) => {
+            toast.success('Document updated successfully');
+          }
+        })
+      }
     }
 
     const formObj = {
-      id: 'create_document_form',
-      title: 'Create New Document',
+      id: isEditMode ? 'edit_document_form' : 'create_document_form',
+      title: isEditMode ? 'Edit Document' : 'Create New Document',
       titleClass: 'text-gray-600 text-xl',
       contents: [  
         {
@@ -151,7 +166,7 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Document Title'
         },
         {
-          id: 'area',
+          id: 'area_id',
           type: 'select',
           label: 'Area',
           className: 'w-full pr-2',
@@ -159,7 +174,7 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Select an area...'
         },
         {
-          id: 'discipline',
+          id: 'discipline_id',
           type: 'select',
           label: 'Discipline',
           className: 'w-full pr-2',
@@ -167,7 +182,7 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Please select a discipline...'
         },
         {
-          id: 'type',
+          id: 'type_id',
           type: 'select',
           label: 'Type',
           className: 'w-full pr-2',
@@ -175,7 +190,7 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Please select a type...'
         },
         {
-          id: 'status',
+          id: 'status_id',
           type: 'select',
           label: 'Status',
           className: 'w-full pr-2',
@@ -183,7 +198,7 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Please select a status...'
         },
         {
-          id: 'revision',
+          id: 'revision_id',
           type: 'select',
           label: 'Revision',
           className: 'w-full pr-2',
@@ -207,12 +222,12 @@ export default function DocumentCreateOrEdit ({ document }) {
           placeholder: 'Please select tags...'
         },
         {
-          id: 'notes',
+          id: 'description',
           type: 'textarea',
-          label: 'Notes',
+          label: 'Description / Notes',
           parentClassName: 'col-span-2 w-full',
           className: 'w-full',
-          placeholder: 'Enter Notes'
+          placeholder: 'Enter extra information here...'
         }
       ],
       // Buttons for the form!
@@ -241,6 +256,8 @@ export default function DocumentCreateOrEdit ({ document }) {
       getStatuses();
       getRevisions();
       getTags();
+      setIsEditMode((document && document?.id) ? true : false);
+      console.log(data)
     }, []);
 
     useEffect(() => {

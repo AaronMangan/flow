@@ -122,6 +122,8 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/documents', [\App\Http\Controllers\DocumentController::class, 'index'])->name('documents');
     Route::get('/documents/create', [\App\Http\Controllers\DocumentController::class, 'create'])->name('documents.create');
     Route::post('/documents', [\App\Http\Controllers\DocumentController::class, 'store'])->name('document.create');
+    // Route::get('/document/{document}/edit', [\App\Http\Controllers\DocumentController::class, 'edit'])->name('document.edit');
+    Route::get('/document/{document}/edit', [\App\Http\Controllers\DocumentController::class, 'edit'])->name('document.edit');
     Route::post('/document/{document}/update', [\App\Http\Controllers\DocumentController::class, 'update'])->name('document.update');
     Route::delete('/document/{document}/delete', [\App\Http\Controllers\AreaController::class, 'destroy'])->name('document.destroy');
 });

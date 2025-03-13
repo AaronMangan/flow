@@ -16,7 +16,7 @@ class DocumentPolicy
         //
         return (\Auth::user()->hasAnyRole(['super', 'admin', 'user']))
             ? Response::allow()
-            : Response::deny('Unauthorised Action');
+            : Response::deny('Unauthorized Action');
     }
 
     /**
@@ -34,7 +34,7 @@ class DocumentPolicy
          */
         return ($document->organisation_id == \Auth::user()->organisation_id)
             ? Response::allow()
-            : Response::deny('Unauthorised');
+            : Response::deny('Unauthorized');
     }
 
     /**
@@ -44,7 +44,7 @@ class DocumentPolicy
     {
         return (\Auth::user()->hasAnyRole(['super', 'admin']))
             ? Response::allow()
-            : Response::deny('Unauthorised Action');
+            : Response::deny('Unauthorized Action');
     }
 
     /**
@@ -60,7 +60,7 @@ class DocumentPolicy
         // Otherwise the user must have an admin role and the model being deleted must be from the users organisation.
         return ($user->hasRole('admin') && $user->organisation_id === $document->organisation_id)
             ? Response::allow()
-            : Response::deny('Not authorised to complete this action');
+            : Response::deny('Not authorized to complete this action');
     }
 
     /**
@@ -76,7 +76,7 @@ class DocumentPolicy
         // Otherwise the user must have an admin role and the model being deleted must be from the users organisation.
         return ($user->hasRole('admin') && $user->organisation_id === $document->organisation_id)
             ? Response::allow()
-            : Response::deny('Not authorised to complete this action');
+            : Response::deny('Not authorized to complete this action');
     }
 
     /**

@@ -25,6 +25,10 @@ export default function FormGen({ className, config, valuesCallback, values, err
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState(values);
   
+  const getSelectedItem = (options, id) => {
+    return options.filter(x => x?.value === id)[0];
+  }
+
   /**
    * Render the JSON config into a form.
    * @param {*} obj The config object (JSON)
@@ -41,9 +45,11 @@ export default function FormGen({ className, config, valuesCallback, values, err
               key={obj.id + '_' + index}
               id={obj.id}
               value={formData[obj.id]}
+              selected={getSelectedItem(obj.data, formData[obj.id])}
               onChange={(e) => {
                 setFormData({...formData, [obj.id]: e.value || ''})
               }}
+              isMulti={false}
               options={obj.data || []}
               placeholder={obj.placeholder || 'Please select an option'}
               className={obj.className}
@@ -184,7 +190,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
         <>
           {/* Start with the title block */}
           <div className="py-4 mt-2 font-bold text-gray-900 dark:text-gray-100">
-            <h2 className={config.titleClass || ''}>Create New Document</h2>
+            <h2 className={config.titleClass || ''}>{config.title}</h2>
           </div>
 
           {/* Then, the contents block */}
