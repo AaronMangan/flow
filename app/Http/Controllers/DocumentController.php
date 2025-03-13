@@ -25,7 +25,7 @@ class DocumentController extends Controller
 
         // Return
         return Inertia::render('Documents/DocumentIndex', [
-            'documents' => $this->getDocuments($request->all())
+            'documents' => $this->getDocuments($request->all()),
         ]);
     }
 
@@ -72,12 +72,19 @@ class DocumentController extends Controller
             'document_number' => $number ?? null
         ]);
 
-        // If the document was saved, then render the index.
-        if ($document->id) {
-            return Inertia::render('Documents/DocumentIndex', [
-                'documents' => $this->getDocuments()
-            ]);
+        $messages = [];
+        if (isset($document->id)) {
+            $messages['success'] = 'Document created successfully';
+        } else {
+            $messages['error'] = 'An error occurred, please try again';
         }
+
+        // If the document was saved, then render the index.
+        return Inertia::render('Documents/DocumentIndex', [
+            'documents' => $this->getDocuments(),
+            'messages' => $messages
+        ]);
+
     }
 
     /**
@@ -130,9 +137,16 @@ class DocumentController extends Controller
             'document_number' => $number ?? $document->document_number ?? null
         ]);
 
+        $messages = [];
+        if (isset($document->id)) {
+            $messages['success'] = 'Document updated successfully';
+        } else {
+            $messages['error'] = 'An error occurred, please try again';
+        }
+
         return Inertia::render('Documents/DocumentCreateOrEdit', [
             'document' => $document->toArray(),
-            'status' => ($updated) ? 'success' : 'fail'
+            'messages' => $messages
         ]);
     }
 

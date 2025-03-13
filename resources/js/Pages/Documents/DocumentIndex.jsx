@@ -15,7 +15,7 @@ import FilterBar from '@/Components/FilterBar';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
-export default function ViewDocuments({ documents }) {
+export default function ViewDocuments({ documents, messages }) {
   let debounceTimer;
   const [showDocumentDetails, setShowDocumentDetails] = useState(false);
   
@@ -188,6 +188,18 @@ export default function ViewDocuments({ documents }) {
       })
     }
   }, [filters]);
+
+  useEffect(() => {
+    if(messages && messages.success) {
+      toast.success(messages.success)
+    }
+    if(messages && messages.warning) {
+      toast.warning(messages.warning)
+    }
+    if(messages && messages.error) {
+      toast.error(messages.error)
+    }
+  }, []);
 
   return (
     <AuthenticatedLayout>

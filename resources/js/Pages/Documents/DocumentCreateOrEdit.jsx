@@ -4,9 +4,9 @@ import { useRef, useState, useEffect } from 'react';
 import FormGen from '@/Components/FormGenerator/FormGen';
 import axios from 'axios';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { toast } from 'react-toastify';
 
-
-export default function DocumentCreateOrEdit ({ document }) {
+export default function DocumentCreateOrEdit ({ document, messages }) {
     const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
         name: document?.name || null,
         document_number: document?.document_number || null,
@@ -263,6 +263,18 @@ export default function DocumentCreateOrEdit ({ document }) {
     useEffect(() => {
         // 
     }, [reset]);
+
+    useEffect(() => {
+      if(messages && messages.success) {
+        toast.success(messages.success)
+      }
+      if(messages && messages.warning) {
+        toast.warning(messages.warning)
+      }
+      if(messages && messages.error) {
+        toast.error(messages.error)
+      }
+    }, []);
 
     return (
       <AuthenticatedLayout>
