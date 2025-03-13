@@ -25,7 +25,7 @@ class DocumentController extends Controller
 
         // Return
         return Inertia::render('Documents/DocumentIndex', [
-            'documents' => $this->getDocuments()
+            'documents' => $this->getDocuments($request->all())
         ]);
     }
 
@@ -149,15 +149,20 @@ class DocumentController extends Controller
      *
      * @return array
      */
-    private function getDocuments(): array
+    private function getDocuments(array $params): array
     {
         $query = Document::query();
 
         if (\Auth::user()->hasRole('super')) {
-            return $query->get()->toArray();
+            if (isset($params['search'])) {
+                $query->where(function ($subquery) use ($params) {
+                    return $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
+                });
+            }
+            return $query->get()->load('discipline', 'area', 'type', 'document_status', 'revision')->toArray();
         }
 
         return $query->where('organisation_id', \Auth::user()->organisation_id)
-            ->get()->toArray() ?? [];
+            ->get()->load('discipline', 'area', 'type', 'document_status', 'revision')->toArray() ?? [];
     }
 }

@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Area;
 use App\Models\Discipline;
+use App\Traits\LogsActivity;
 
 class Document extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'name', 'description', 'user_id', 'organisation_id', 'document_status_id', 'discipline_id', 'type_id', 'area_id', 'revision_id', 'document_number'
     ];
@@ -47,8 +50,13 @@ class Document extends Model
         return $this->hasOne(\App\Models\Type::class, 'id', 'type_id');
     }
 
-    public function documentNumber()
+    public function revision()
     {
+        return $this->hasOne(\App\Models\Revision::class, 'id', 'revision_id');
+    }
 
+    public function document_status()
+    {
+        return $this->hasOne(\App\Models\DocumentStatus::class, 'id', 'document_status_id');
     }
 }

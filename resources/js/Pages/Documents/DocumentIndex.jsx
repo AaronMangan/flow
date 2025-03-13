@@ -11,17 +11,17 @@ import { toast } from 'react-toastify';
 import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
-import Tooltip from '@/Components/Tooltip';
+import FilterBar from '@/Components/FilterBar';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
 export default function ViewDocuments({ documents }) {
-  const [showCreateDocument, setShowCreateDocument] = useState(false);
-  /**
-   * Construct a form object.
-   */
-  const { data, setData, post, processing, reset, errors, clearErrors } = useForm({ name: '', code: '', description: '' });
-  const [activeDocument, setActiveDocument] = useState({ data });
+  let debounceTimer;
+  const [showDocumentDetails, setShowDocumentDetails] = useState(false);
   
+  const [activeDocument, setActiveDocument] = useState({});
+  const [filters, setFilters] = useState([]);
+
   /**
    * Document Table Columns
    */
@@ -53,7 +53,9 @@ export default function ViewDocuments({ documents }) {
                     router.get(route('document.edit', row?.id))
                 }}
                 className='mr-2'
-            >Edit</PrimaryButton>
+            >
+              <PencilIcon className="w-3 h-3 mr-2"/>Edit
+            </PrimaryButton>
             <DangerButton
               id={'delete_' + row?.id}
               onClick={(e) => {
@@ -62,11 +64,22 @@ export default function ViewDocuments({ documents }) {
                 setActiveDocument(row);
                 deleteDocument(row.id);
               }}
-            >Delete</DangerButton>
+              className='mr-2'
+            >
+              <TrashIcon className="w-3 h-3 mr-2"/>
+              Delete
+            </DangerButton>
+            <PrimaryButton className="flex-start" onClick={() => {
+                setActiveDocument(row)
+                setShowDocumentDetails(true)
+              }}>
+              <DocumentTextIcon className="w-3 h-3 mr-2"/>
+              Details
+            </PrimaryButton>
           </>
         );
       },
-      width: '20pc'
+      width: '25pc'
     }
   ];
 
@@ -84,47 +97,13 @@ export default function ViewDocuments({ documents }) {
     }
   };
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'code',
-      type: 'text',
-      label: 'Code',
-      placeholder: 'Please enter a code',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'description',
-      type: 'textarea',
-      label: 'Description',
-      placeholder: '[Optional] Description...',
-      className: 'w-full m-2',
-      rows: 5
-    }
-  ];
-
-  /**
-   * Update the form data with the data from the form generator
-   * @param {object} values 
-   */
-  const updateFormData = (values) => {
-    setData(null);
-    setData(values);
-  }
-
   /**
    * Close Modal
    */
   const closeModal = () => {
     setActiveDocument(null);
     setActiveDocument({ name: '', code: '', description: '' })
-    setShowCreateDocument(false);
+    setShowDocumentDetails(false);
   }
 
   /**
@@ -146,7 +125,7 @@ export default function ViewDocuments({ documents }) {
         post(route('area.update', {area: activeDocument}), {
             onSuccess: () => {
                 toast.success('Document updated successfully');
-                setShowCreateDocument(false);
+                setShowDocumentDetails(false);
                 setActiveDocument(null);
                 refreshData();
             },
@@ -159,7 +138,7 @@ export default function ViewDocuments({ documents }) {
         onSuccess: () => {
           toast.success('Document created successfully!');
           setActiveDocument(null);
-          setShowCreateDocument(false);
+          setShowDocumentDetails(false);
           refreshData();
         },
         onError: () => {
@@ -181,6 +160,35 @@ export default function ViewDocuments({ documents }) {
     })
   }
 
+  const valuesCallback = (newFilters) => {
+    // Clear previous timeout
+    clearTimeout(debounceTimer);
+
+    // Set a new timeout
+    debounceTimer = setTimeout(() => {
+      setFilters(newFilters)
+    }, 500); // 500ms delay
+  }
+  const filterOptions = [
+    {
+      id: 'search',
+      type: 'text',
+      label: 'Search',
+      className: 'w-[300px]',
+      placeholder: 'Enter search'
+    },
+  ];
+
+  useEffect(() => {
+    if(typeof filters.search !== 'undefined') {
+      router.visit('documents?search=' + filters?.search || '', {
+        preserveState: true,
+        only: ['documents'],
+        replace: true
+      })
+    }
+  }, [filters]);
+
   return (
     <AuthenticatedLayout>
     <Head title="Documents" />
@@ -196,12 +204,19 @@ export default function ViewDocuments({ documents }) {
                 </>
               )}
               {documents && documents.length > 0 && (
-                <TableView
-                  data={documents}
-                  columns={areaColumns}
-                  customStyles={customStyles}
-                  className='rounded-lg'
-                />
+                <div>
+                  <div>
+                    <FilterBar valuesCallback={valuesCallback} config={filterOptions} values={filters} className="inline-flex w-full my-2" />
+                  </div>
+                  <div>
+                    <TableView
+                      data={documents}
+                      columns={areaColumns}
+                      customStyles={customStyles}
+                      className='rounded-lg'
+                    />
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -209,37 +224,50 @@ export default function ViewDocuments({ documents }) {
 
         {/* Lets users add a new setting */}
         <FloatingButton className="bg-gray-800" onClick={
-            () => {setShowCreateDocument(true)}
+            () => {setShowDocumentDetails(true)}
         }/>
       </>
 
       {/* Create a new setting modal */}
-      <Modal show={showCreateDocument} onClose={closeModal}>
-        <form onSubmit={(e) => {postDocument(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {activeDocument && activeDocument?.id > 0 ? 'Edit ' + activeDocument?.name : 'Add New Document'}
-          </h2>
-          <FormGenerator
-            className='w-full'
-            config={formObj}
-            valuesCallback={updateFormData}
-            values={activeDocument}
-            errors={errors}
-          />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+      <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
+        <div className='px-4 py-4 overflow-y'>
+          <dl class="grid grid-cols-1 gap-x-8 gap-y-4">
+            <div>
+              <dt class="font-bold text-gray-900">Document Number</dt>
+              <dd class="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Title</dt>
+              <dd class="text-gray-600">{activeDocument.name}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Area</dt>
+              <dd class="text-gray-600">{activeDocument?.area?.name}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Discipline</dt>
+              <dd class="text-gray-600">{activeDocument.discipline?.name}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Type</dt>
+              <dd class="text-gray-600">{activeDocument?.type?.name}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Revision</dt>
+              <dd class="text-gray-600">{activeDocument?.revision?.code}</dd>
+            </div>
+            <div>
+              <dt class="font-bold text-gray-900">Status</dt>
+              <dd class="text-gray-600">{activeDocument?.document_status?.name}</dd>
+            </div>
+            <div className='text-right'>
+              <PrimaryButton className="" onClick={closeModal}>
+                <XMarkIcon className="w-3 h-3 mr-2"/>
+                Close
+              </PrimaryButton>
+            </div>
+          </dl>
+        </div>
       </Modal>
     </AuthenticatedLayout>
   );
