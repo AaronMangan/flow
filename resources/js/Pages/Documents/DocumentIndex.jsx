@@ -24,7 +24,7 @@ export default function ViewDocuments({ documents, messages }) {
   /**
    * Document Table Columns
    */
-  const areaColumns = [
+  const documentColumns = [
     {
       name: '#',
       selector: row => row.id,
@@ -222,7 +222,7 @@ export default function ViewDocuments({ documents, messages }) {
                   <div>
                     <TableView
                       data={documents}
-                      columns={areaColumns}
+                      columns={documentColumns}
                       customStyles={customStyles}
                       className='rounded-lg'
                     />

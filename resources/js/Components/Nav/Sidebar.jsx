@@ -16,7 +16,8 @@ import {
   GlobeAltIcon,
   TagIcon,
   DocumentIcon,
-  DocumentPlusIcon
+  DocumentPlusIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useUser } from '@/Flow/useUser';
@@ -58,6 +59,21 @@ const Sidebar = ({ user }) => {
           name: 'New Document',
           icon: <DocumentPlusIcon className="w-7 h-7" />,
           path: '/documents/create',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
+        }
+      ],
+    },
+    {
+      // Transmittals
+      visibility: () => (userHasRole('admin') || userHasRole('super')),
+      name: 'Transmittals',
+      icon: <PaperAirplaneIcon className='w-7 h-7' />,
+      path: '',
+      children: [
+        {
+          name: 'All Transmittals',
+          icon: <DocumentIcon className="w-7 h-7" />,
+          path: '/transmittals',
           visibility: () => (userHasRole('admin') || userHasRole('super')),
         }
       ],

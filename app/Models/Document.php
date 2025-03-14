@@ -50,13 +50,28 @@ class Document extends Model
         return $this->hasOne(\App\Models\Type::class, 'id', 'type_id');
     }
 
+    /**
+     * Returns the revision related to the document.
+     *
+     * @return void
+     */
     public function revision()
     {
         return $this->hasOne(\App\Models\Revision::class, 'id', 'revision_id');
     }
 
+    /**
+     * Returns the document status related to the document.
+     *
+     * @return void
+     */
     public function document_status()
     {
         return $this->hasOne(\App\Models\DocumentStatus::class, 'id', 'document_status_id');
+    }
+
+    public function transmittals()
+    {
+        return $this->belongsToMany(\App\Models\Transmittal::class);
     }
 }

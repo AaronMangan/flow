@@ -14,7 +14,7 @@ export default function Tooltip ({ text, children }) {
 
     return (
         <div 
-            className="w-[100vw] tooltip-container" 
+            className="tooltip-container" 
             onMouseEnter={handleMouseEnter} 
             onMouseLeave={handleMouseLeave}
             style={{ position: 'relative', display: 'inline-block' }}
