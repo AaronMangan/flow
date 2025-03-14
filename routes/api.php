@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+// use App\Http\Controllers\Api\Document\ApiDocumentController;
+use App\Models\Config;
 
 // Public routes
 Route::post('/auth/token', [AuthController::class, 'generateToken']);
@@ -223,4 +225,41 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return response()->json(['status' => 'success', 'data' => $data]);
 
     })->name('api.tags');
+
+    /**
+     * Returns the selected values from the configurable settings.
+     */
+    Route::middleware(['role:super|admin|user', 'auth'])->get('/metadata', function (Request $request) {
+        $output = [];
+
+        // Check that a value was provided and is a valid string
+        if (!$request->has('values') || is_null($request->values) || empty($request->values) || gettype($request->values) !== "string") {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Please provide values to be returned'
+            ]);
+        }
+
+        // Get the keys to returned.
+        $requestedKeys = explode(',', $request->query('values', ''));
+
+        // Get the configs that match those keys.
+        $configurations = Config::where('organisation_id', $request->user()->organisation_id)->whereIn('key', $requestedKeys)->get()->toArray();
+
+        // Iterate over the configuration values for the org.
+        foreach ($configurations as $config) {
+            $output[$config['key']] = $config['values'] ?? [];
+        }
+
+        // Return the information.
+        return response()->json([
+            'status' => 'success',
+            'data' => $output
+        ]);
+    })->name('metadata');
+
+    /**
+     * Searches for documents
+     */
+    Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [\App\Http\Controllers\Api\Document\ApiDocumentController::class, 'index'])->name('api.document-list');
 });

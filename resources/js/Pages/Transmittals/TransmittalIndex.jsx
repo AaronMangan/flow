@@ -5,10 +5,23 @@ import TableView from '@/Components/TableView';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head } from '@inertiajs/react';
 import { EyeIcon } from '@heroicons/react/24/solid';
-import { truncateText, formatDate, debounce } from "../../Utils/helpers";
+import { truncateText } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
+import FloatingButton from '@/Components/FloatingButton';
+import { router } from '@inertiajs/react';
 
 export default function TransmittalIndex({ transmittals }) {
+    /**
+     * Route to the create transmittal page.
+     */
+    const createTransmittal = () => {
+        // router.visit(route('transmittals.create'), {
+        //     replace: true,
+        //     preserveState: false
+        // })
+        router.get(route('transmittals.create'))
+    }
+
     /**
      * Custom Styles for the table headers
      */
@@ -35,7 +48,14 @@ export default function TransmittalIndex({ transmittals }) {
         },
         {
             name: 'Status',
-            selector: row => row?.status?.name || 'Unknown',
+            cell: (row) => {
+                return (
+                    <span>
+                        <Tooltip text={row?.status?.description || row?.status?.name}>{row?.status?.name}</Tooltip>
+                    </span>
+                );
+            },
+            width: '15%'
         },
         {
             name: '# Items',
@@ -43,13 +63,15 @@ export default function TransmittalIndex({ transmittals }) {
                 return (
                     <span>{row?.documents?.length || 0}</span>
                 );
-            }
+            },
+            width: '10pc',
+            // center: true
         },
         {
             name: 'Details',
             cell: (row) => {
                 return (
-                    <span><Tooltip text={row?.details}>{truncateText(row?.details, 20)}</Tooltip></span>
+                    <span><Tooltip text={row?.details}>{truncateText(row?.details, 100)}</Tooltip></span>
                 );
             }
         },
@@ -61,7 +83,7 @@ export default function TransmittalIndex({ transmittals }) {
                         <SecondaryButton
                             id={'edit_' + row?.id}
                             onClick={(e) => {
-                            alert('To Be Done!');
+                                alert('To Be Done!');
                             }}
                             className='mr-2'
                         >
@@ -70,6 +92,7 @@ export default function TransmittalIndex({ transmittals }) {
                     </>
                 );
             },
+            // right: 'true',
         }
     ];
     return (
@@ -77,11 +100,11 @@ export default function TransmittalIndex({ transmittals }) {
             <Head title="Transmittal Index" />
             <>
                 <div className="py-12">
-                    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div className="max-w-full mx-auto sm:px-6 lg:px-8">
                         {/* <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                             
                         </div> */}
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
+                        <div className="w-full p-6 text-gray-900 dark:text-gray-100">
                             <TableView
                                 data={transmittals}
                                 columns={transmittalColumns}
@@ -90,6 +113,11 @@ export default function TransmittalIndex({ transmittals }) {
                             />
                         </div>
                     </div>
+                    
+                    {/* Lets users create a new transmittal */}
+                    <FloatingButton className="bg-gray-800" onClick={() => {
+                        createTransmittal();
+                    }}/>
                 </div>
             </>
         </AuthenticatedLayout>

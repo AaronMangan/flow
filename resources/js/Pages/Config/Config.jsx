@@ -27,6 +27,7 @@ export default function Config({ auth, config }) {
         return {
             name: '',
             values: '',
+            key: '',
             organisation_id: auth?.user?.organisation_id || null
         }
     })
@@ -67,6 +68,7 @@ export default function Config({ auth, config }) {
     } = useForm({
         name: '',
         values: '',
+        key: '',
         organisation_id: auth?.user?.organisation_id || null
     });
 
@@ -185,6 +187,7 @@ export default function Config({ auth, config }) {
             setData(null);
             setData({
                 name: row?.name || '',
+                key: row?.key || '',
                 values: JSON.stringify(row?.values) || '',
                 // organisation_id: !userHasRole('super') ? auth?.user?.organisation_id : row?.organisation_id
                 organisation_id: row?.organisation_id
@@ -259,7 +262,7 @@ export default function Config({ auth, config }) {
                         </div>
                     )}
                     
-                    {/* User name field */}
+                    {/* Name field */}
                     <div className="mt-6">
                         <InputLabel
                             htmlFor="name"
@@ -280,6 +283,31 @@ export default function Config({ auth, config }) {
                         />
                         {errors && errors.name && <InputError
                             message={errors.name}
+                            className="mt-2"
+                        />}
+                    </div>
+
+                    {/* Key field - This is used to retrieve the key and if not provided, will be taken from the name field. */}
+                    <div className="mt-6">
+                        <InputLabel
+                            htmlFor="key"
+                            value="Key"
+                            className=""
+                        />
+                        <TextInput
+                            id="key"
+                            type="text"
+                            name="key"
+                            value={data.key}
+                            onChange={(e) =>
+                                setData('key', e.target.value)
+                            }
+                            className="block w-full mt-1"
+                            isFocused
+                            placeholder="Setting Key"
+                        />
+                        {errors && errors.key && <InputError
+                            message={errors.key}
                             className="mt-2"
                         />}
                     </div>

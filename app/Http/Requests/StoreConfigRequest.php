@@ -25,6 +25,9 @@ class StoreConfigRequest extends FormRequest
             'name' => [
                 'string', 'required', 'max:255'
             ],
+            'key' => [
+                'string', 'alpha_dash', 'regex:/^\S+$/', 'max:255'
+            ],
             'values' => [
                 'json'
             ],

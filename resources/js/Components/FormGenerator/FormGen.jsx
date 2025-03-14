@@ -20,6 +20,7 @@ import TextInput from '../TextInput';
 import LoadingSpinner from '../LoadingSpinner';
 import PrimaryButton from '../PrimaryButton';
 import DangerButton from '../DangerButton';
+import ButtonList from '../ButtonList';
 
 export default function FormGen({ className, config, valuesCallback, values, errors, reset, ...props }){
   const [loading, setLoading] = useState(true);
@@ -138,6 +139,24 @@ export default function FormGen({ className, config, valuesCallback, values, err
               <InputError className="px-2" message={errors[obj.id]} />
             </div>
           );
+        case 'button_list':
+          return (
+            <div key={obj.id} className={obj.parentClassName}>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <ButtonList
+                id={obj.id}
+                name={obj.name}
+                placeholder={obj.placeholder || null}
+                className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                onChange={(e) => {
+                    setFormData({...formData, [obj.id]: e.target.value || ''});
+                }}
+                rows={obj.rows || 3}
+                value={formData[obj.id] || ''}
+              />
+              <InputError className="px-2" message={errors[obj.id]} />
+            </div>
+          );
         case 'checkbox':
           return (
             <div key={obj.id + '_' + obj.type} className="flex items-center justify-start">
@@ -193,7 +212,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
       {!loading && config && (
         <>
           {/* Start with the title block */}
-          <div className="py-4 mt-2 font-bold text-gray-900 dark:text-gray-100">
+          <div className="py-2 mt-2 font-bold text-gray-900 dark:text-gray-100">
             <h2 className={config.titleClass || ''}>{config.title}</h2>
           </div>
 

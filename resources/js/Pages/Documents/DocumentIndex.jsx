@@ -11,8 +11,7 @@ import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import FilterBar from '@/Components/FilterBar';
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
-import { DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { ExclamationCircleIcon, DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
 export default function ViewDocuments({ documents, messages }) {
   let debounceTimer;
@@ -233,9 +232,9 @@ export default function ViewDocuments({ documents, messages }) {
           </div>
         </div>
 
-        {/* Lets users add a new setting */}
+        {/* Allows users add a new document */}
         <FloatingButton className="bg-gray-800" onClick={
-            () => {setShowDocumentDetails(true)}
+          () => {setShowDocumentDetails(true)}
         }/>
       </>
 

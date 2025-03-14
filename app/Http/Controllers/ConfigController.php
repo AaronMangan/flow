@@ -33,7 +33,7 @@ class ConfigController extends Controller
      */
     public function store(StoreConfigRequest $request)
     {
-        $data = $request->safe()->only(['name', 'values', 'organisation_id']);
+        $data = $request->safe()->only(['name', 'key', 'values', 'organisation_id']);
         $data['organisation_id'] = \Auth::user()->organisation_id;
         $data['values'] = json_decode($data['values']);
         $created = Config::create($data);
@@ -70,7 +70,7 @@ class ConfigController extends Controller
         }
 
         // Save the validated data.
-        $data = $request->safe()->only(['name', 'values', 'organisation_id']);
+        $data = $request->safe()->only(['name', 'key', 'values', 'organisation_id']);
 
         // Decode the JSON.
         $data['values'] = json_decode($data['values']);

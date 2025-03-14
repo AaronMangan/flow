@@ -31,7 +31,15 @@ class TransmittalController extends Controller
      */
     public function create(Request $request)
     {
-        //
+        // Check that the user can create a transmittal. If not, then abort the request.
+        if ($request->user()->cannot('create', Transmittal::class)) {
+            abort(403);
+        }
+
+        // Return the transmittal index.
+        return Inertia::render('Transmittals/CreateTransmittal', [
+            'transmittals' => $this->getTransmittals($request->all()),
+        ]);
     }
 
     /**

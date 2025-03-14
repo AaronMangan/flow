@@ -13,6 +13,7 @@ return new class () extends Migration {
         Schema::create('configs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('key');
             $table->json('values')->nullable();
             $table->foreignId('organisation_id')->constrained('organisations');
             $table->softDeletes();
