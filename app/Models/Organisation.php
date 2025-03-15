@@ -38,4 +38,14 @@ class Organisation extends Model
     {
         return $this->hasMany(Config::class, 'organisation_id', 'id');
     }
+
+    public function document_statuses()
+    {
+        return $this->hasMany(\App\Models\DocumentStatus::class, 'organisation_id', 'id');
+    }
+
+    public function disciplines()
+    {
+        return $this->hasMany(\App\Models\Disciplines::class, 'organisation_id', 'id');
+    }
 }

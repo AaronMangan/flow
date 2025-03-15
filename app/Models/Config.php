@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\LogsActivity;
+use Illuminate\Support\Arr;
 
 class Config extends Model
 {
@@ -16,7 +17,7 @@ class Config extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'values', 'organisation_id'
+        'name', 'key', 'values', 'organisation_id'
     ];
 
     /**

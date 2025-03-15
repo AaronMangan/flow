@@ -38,6 +38,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * Always include these relationships
+     *
+     * @var array
+     */
+    protected $with = ['organisation'];
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
@@ -47,7 +54,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $append = ['token'];
+    protected $append = ['token', 'config'];
 
     /**
      * Get the attributes that should be cast.
@@ -89,11 +96,24 @@ class User extends Authenticatable
 
     public function getTokenAttribute(): Attribute
     {
-        // return JWTAuth::fromUser($this);
         return new Attribute(
             get: fn () => 'yes',
         );
     }
+
+    /**
+     * Returns the users org config
+     *
+     * @return Attribute
+     */
+    public function config(): Attribute
+    {
+        return new Attribute(
+            get: fn () => \App\Flow\Config::orgConfig() ?? [],
+        );
+    }
+
+
 
     /**
      * Return the JWT Identifier

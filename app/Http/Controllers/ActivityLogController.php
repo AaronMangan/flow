@@ -65,6 +65,6 @@ class ActivityLogController extends Controller
             $query->where('organisation_id', auth()->user()->organisation_id);
         }
 
-        return $query->paginate(5);
+        return $query->paginate(50);
     }
 }

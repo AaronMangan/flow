@@ -2,7 +2,6 @@ import React from 'react';
 
 export default function DataView ({ data }) {
   const renderItem = (key, value) => {
-    console.log(`key: ${key} is ` + typeof key + ` value: ${value} is ` + typeof value);
     try {
       if (typeof value === 'object' && value !== null) {
         // If value is an object (nested JSON), recursively render it

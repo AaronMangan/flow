@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Config;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Requests\StoreConfigRequest;
@@ -32,14 +33,13 @@ class ConfigController extends Controller
      */
     public function store(StoreConfigRequest $request)
     {
-        $data = $request->safe()->only(['name', 'values']);
+        $data = $request->safe()->only(['name', 'key', 'values', 'organisation_id']);
         $data['organisation_id'] = \Auth::user()->organisation_id;
         $data['values'] = json_decode($data['values']);
         $created = Config::create($data);
 
         return Inertia::render('Config/Config', [
             'config' => $this->getConfig(),
-            'status' => 'success'
         ]);
     }
 
@@ -62,9 +62,26 @@ class ConfigController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Config $config)
+    public function update(StoreConfigRequest $request, Config $config)
     {
-        //
+        // Authorise the action.
+        if ($request->user()->cannot('update', Config::class)) {
+            abort(403);
+        }
+
+        // Save the validated data.
+        $data = $request->safe()->only(['name', 'key', 'values', 'organisation_id']);
+
+        // Decode the JSON.
+        $data['values'] = json_decode($data['values']);
+
+        // Save the data.
+        $updated = $config->update($data);
+
+        // Return the response.
+        return Inertia::render('Config/Config', [
+            'config' => $this->getConfig()
+        ]);
     }
 
     /**
@@ -83,9 +100,9 @@ class ConfigController extends Controller
     private function getConfig(): ?array
     {
         if (auth()->user()->hasRole('super')) {
-            return Config::all()->toArray();
+            return Config::with('organisation')->get()->toArray();
         } else {
-            return auth()->user()->organisation->config->toArray();
+            return auth()->user()->organisation->config()->toArray();
         }
     }
 }
