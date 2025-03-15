@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Transmittal;
 use App\Models\Transmittal;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Transmittals\CreateTransmittalRequest;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,9 +46,10 @@ class TransmittalController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateTransmittalRequest $request)
     {
         //
+        dd($request->all());
     }
 
     /**

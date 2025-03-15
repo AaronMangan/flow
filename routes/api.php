@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-// use App\Http\Controllers\Api\Document\ApiDocumentController;
+use App\Http\Controllers\Api\Document\ApiDocumentController;
 use App\Models\Config;
 
 // Public routes
@@ -259,7 +259,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
     })->name('metadata');
 
     /**
+     * Returns users of other organisations, where connections have been established.
+     */
+    Route::middleware(['role:super|admin', 'auth'])->get('/user-select', function (Request $request) {
+        // Get the users.
+        $users = \App\Models\User::where('organisation_id', $request->user()->organisation_id)->get(['id', 'name', 'organisation_id', 'email'])->toArray();
+
+        // Response being returned.
+        return response()->json([
+            'status' => 'success',
+            'data' => $users ?? []
+        ]);
+    })->name('api.user-select');
+
+    /**
      * Searches for documents
      */
-    Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [\App\Http\Controllers\Api\Document\ApiDocumentController::class, 'index'])->name('api.document-list');
+    // Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [\App\Http\Controllers\Api\Document\ApiDocumentController::class, 'index'])->name('api.document-list');
+    Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [ApiDocumentController::class, 'index'])->name('api.document-list');
 });
