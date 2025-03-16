@@ -20,7 +20,7 @@ export default function CreateTransmittal() {
      */
     const submitForm = (e) => {
         // e.preventDefault();
-        post(route('transmittals.store'), {
+        post(route('transmittal.store'), {
             onSuccess: () => {},
             onError: () => {
                 toast.error('An error occurred saving transmittal, please try again')

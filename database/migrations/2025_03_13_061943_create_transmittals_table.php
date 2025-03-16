@@ -21,6 +21,8 @@ return new class () extends Migration {
 
             // Status of the transmittal.
             $table->foreignId('status_id')->constrained('document_statuses');
+
+            $table->dateTime('sent_at')->nullable();
             $table->timestamps();
         });
 

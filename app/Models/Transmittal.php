@@ -11,7 +11,11 @@ class Transmittal extends Model
 {
     //
     protected $fillable = [
-        'to', 'details', 'organisation_id', 'status_id'
+        'to', 'details', 'organisation_id', 'status_id', 'sent_at'
+    ];
+
+    protected $casts = [
+        'to' => 'array'
     ];
 
     public function documents()

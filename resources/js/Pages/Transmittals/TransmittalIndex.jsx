@@ -4,24 +4,28 @@ import DangerButton from '@/Components/DangerButton';
 import TableView from '@/Components/TableView';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head } from '@inertiajs/react';
-import { EyeIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, UserIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { truncateText } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
 import FloatingButton from '@/Components/FloatingButton';
 import { router } from '@inertiajs/react';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
+import axios from 'axios';
 
 export default function TransmittalIndex({ transmittals, messages }) {
     /**
      * Route to the create transmittal page.
      */
     const createTransmittal = () => {
-        // router.visit(route('transmittals.create'), {
-        //     replace: true,
-        //     preserveState: false
-        // })
-        router.get(route('transmittals.create'))
+        router.get(route('transmittal.create'))
+    }
+
+    /**
+     * 
+     */
+    const sendTransmittal = (id) => {
+        axios.post(route('transmittal.send', {transmittal: id})).then(res => {}).catch(ex => console.error(ex))
     }
 
     /**
@@ -45,8 +49,15 @@ export default function TransmittalIndex({ transmittals, messages }) {
         },
         {
             name: 'To',
-            selector: row => row?.to || 'N/A',
+            selector: row => row?.to?.map((x, index) => {
+                return (
+                    <div key={'badge_' + row?.id + '_' + index + '_parent'} className="p-1 m-1">
+                        <span key={'badge_' + row?.id + '_' + index} className='px-2 py-1 mx-auto mt-2 text-xs font-semibold text-white bg-blue-500 rounded-lg'>{x}</span>
+                    </div>
+                )
+            }) || 'N/A',
             width: '15pc',
+            wrap: true
         },
         {
             name: 'Status',
@@ -91,6 +102,17 @@ export default function TransmittalIndex({ transmittals, messages }) {
                         >
                             <EyeIcon className="w-3 h-3 mr-2"/>View
                         </SecondaryButton>
+                        {row?.sent_at === null && (
+                            <PrimaryButton
+                                id={'send_' + row?.id}
+                                onClick={(e) => {
+                                    sendTransmittal(row?.id);
+                                }}
+                                className='mr-2'
+                            >
+                                <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Send
+                            </PrimaryButton>
+                        )}
                     </>
                 );
             },

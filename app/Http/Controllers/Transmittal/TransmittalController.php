@@ -159,4 +159,17 @@ class TransmittalController extends Controller
         return $query->where('organisation_id', \Auth::user()->organisation_id)
             ->get()->load('documents', 'status')->toArray() ?? [];
     }
+
+    /**
+     * Send the transmittal to its intended recipients.
+     *
+     * @param Request $request
+     * @param Transmittal $transmittal
+     * @return void
+     */
+    public function send(Request $request, Transmittal $transmittal)
+    {
+        //
+        dd($transmittal);
+    }
 }

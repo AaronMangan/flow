@@ -133,8 +133,9 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
  */
 Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/transmittals', [TransmittalController::class, 'index'])->name('transmittals');
-    Route::get('/transmittals/create', [TransmittalController::class, 'create'])->name('transmittals.create');
-    Route::post('/transmittal/create', [TransmittalController::class, 'store'])->name('transmittals.store');
+    Route::get('/transmittals/create', [TransmittalController::class, 'create'])->name('transmittal.create');
+    Route::post('/transmittal/create', [TransmittalController::class, 'store'])->name('transmittal.store');
+    Route::post('/transmittal/{transmittal}/send', [TransmittalController::class, 'send'])->name('transmittal.send');
 });
 
 // Add auth routes.
