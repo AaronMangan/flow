@@ -165,24 +165,15 @@ export default function FormGen({ className, config, valuesCallback, values, err
           return (
             <div key={obj.id} className={obj.parentClassName}>
               <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
-              {/* <ButtonList
-                id={obj.id}
-                name={obj.name}
-                placeholder={obj.placeholder || null}
-                className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
-                rows={obj.rows || 3}
-                value={formData[obj.id] || []}
-                valuesCallback={(updatedValues) => {
-                  setFormData((prev) => ({
-                      ...prev,
-                      [obj.id]: updatedValues[obj.id] // Ensure documents persist
-                  }));
-                }}
-              /> */}
               <UserSelector
                 value={formData[obj.id] || []}
                 className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
-                onChange={(e) => {}}
+                onChange={(updatedValues) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    [obj.id]: updatedValues // Ensure documents persist
+                  }));
+                }}                
               />
               <InputError className="px-2" message={errors[obj.id]} />
             </div>

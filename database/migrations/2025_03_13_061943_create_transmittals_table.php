@@ -13,7 +13,7 @@ return new class () extends Migration {
         // Create the transmittal table
         Schema::create('transmittals', function (Blueprint $table) {
             $table->id();
-            $table->string('to');
+            $table->json('to');
             $table->longText('details')->nullable();
 
             // Related organisation (of the creating user)

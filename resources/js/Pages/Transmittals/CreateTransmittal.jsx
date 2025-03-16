@@ -10,7 +10,7 @@ import FormGen from '@/Components/FormGenerator/FormGen';
 export default function CreateTransmittal() {
     const [transmittalStatus, setTransmittalStatus] = useState([]);
     const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
-        to: '',
+        to: [],
         details: '',
         documents: [],
         transmittal_status: 1,
@@ -18,9 +18,10 @@ export default function CreateTransmittal() {
     /**
      * Submit the form and create the transmittal.
      */
-    const submitForm = () => {
+    const submitForm = (e) => {
+        // e.preventDefault();
         post(route('transmittals.store'), {
-            onSuccess:  () => {},
+            onSuccess: () => {},
             onError: () => {
                 toast.error('An error occurred saving transmittal, please try again')
             }
@@ -32,9 +33,13 @@ export default function CreateTransmittal() {
      * @param {*} data 
      */
     const setFormValues = (values) => {
-        setData(null)
-        setData({ ...data, ...values })
+        setData(null);
+        setData(values);
     }
+
+    useEffect(() => {
+        // 
+    }, [data]);
 
     /**
      * Defines the form object used for the create transmittal form.
@@ -91,7 +96,7 @@ export default function CreateTransmittal() {
           {
             id: 'save_button',
             label: 'Save',
-            onClick: (e) => submitForm(),
+            onClick: (e) => submitForm(e),
             type: 'primary'
           }
         ]

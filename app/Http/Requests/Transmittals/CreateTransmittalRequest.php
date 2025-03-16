@@ -24,7 +24,7 @@ class CreateTransmittalRequest extends FormRequest
     {
         return [
             'to' => [
-                'string', 'max:255', 'required'
+                'array', 'max:255', 'required'
             ],
             'details' => [
                 'string', 'nullable'
@@ -32,7 +32,9 @@ class CreateTransmittalRequest extends FormRequest
             'documents' => [
                 'array', 'required'
             ],
-            'transmittal_statuses'
+            'transmittal_status' => [
+                'numeric', 'required'
+            ]
         ];
     }
 

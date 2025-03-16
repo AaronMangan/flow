@@ -9,8 +9,10 @@ import { truncateText } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
 import FloatingButton from '@/Components/FloatingButton';
 import { router } from '@inertiajs/react';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 
-export default function TransmittalIndex({ transmittals }) {
+export default function TransmittalIndex({ transmittals, messages }) {
     /**
      * Route to the create transmittal page.
      */
@@ -95,6 +97,20 @@ export default function TransmittalIndex({ transmittals }) {
             // right: 'true',
         }
     ];
+
+    useEffect(() => {
+        if(messages && messages?.success) {
+            toast.success(messages?.success)
+        }
+
+        if(messages && messages?.warning) {
+            toast.warning(messages?.warning)
+        }
+
+        if(messages && messages?.error) {
+            toast.error(messages?.error)
+        }
+    }, [messages]);
     return (
         <AuthenticatedLayout>
             <Head title="Transmittal Index" />
