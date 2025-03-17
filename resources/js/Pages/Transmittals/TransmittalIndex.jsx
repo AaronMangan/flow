@@ -113,6 +113,17 @@ export default function TransmittalIndex({ transmittals, messages }) {
                                 <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Send
                             </PrimaryButton>
                         )}
+                        {row?.sent_at !== null && (
+                            <DangerButton
+                                id={'send_' + row?.id}
+                                onClick={(e) => {
+                                    sendTransmittal(row?.id);
+                                }}
+                                className='mr-2'
+                            >
+                                <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Resend
+                            </DangerButton>
+                        )}
                     </>
                 );
             },
