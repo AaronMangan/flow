@@ -13,7 +13,7 @@ return new class () extends Migration {
         // Create the transmittal table
         Schema::create('transmittals', function (Blueprint $table) {
             $table->id();
-            $table->string('to');
+            $table->json('to');
             $table->longText('details')->nullable();
 
             // Related organisation (of the creating user)
@@ -21,6 +21,9 @@ return new class () extends Migration {
 
             // Status of the transmittal.
             $table->foreignId('status_id')->constrained('document_statuses');
+
+            $table->dateTime('sent_at')->nullable();
+            $table->dateTime('acknowledged_at')->nullable();
             $table->timestamps();
         });
 

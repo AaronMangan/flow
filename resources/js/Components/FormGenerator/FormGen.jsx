@@ -21,6 +21,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import PrimaryButton from '../PrimaryButton';
 import DangerButton from '../DangerButton';
 import ButtonList from '../ButtonList';
+import UserSelector from '../UserSelector';
 
 export default function FormGen({ className, config, valuesCallback, values, errors, reset, ...props }){
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
               options={obj.data || []}
               value={formData[obj.id]}
               onChange={(e) => {
-                setFormData({...formData, [obj.id]: e.value || ''})
+                setFormData({...formData})
               }}
               className={'react-select-container ' + obj.className}
               classNamePrefix='react-select'
@@ -148,11 +149,31 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 name={obj.name}
                 placeholder={obj.placeholder || null}
                 className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
-                onChange={(e) => {
-                    setFormData({...formData, [obj.id]: e.target.value || ''});
-                }}
                 rows={obj.rows || 3}
-                value={formData[obj.id] || ''}
+                value={formData[obj.id] || []}
+                valuesCallback={(updatedValues) => {
+                  setFormData((prev) => ({
+                      ...prev,
+                      [obj.id]: updatedValues[obj.id] // Ensure documents persist
+                  }));
+                }}
+              />
+              <InputError className="px-2" message={errors[obj.id]} />
+            </div>
+          );
+        case 'user_list':
+          return (
+            <div key={obj.id} className={obj.parentClassName}>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <UserSelector
+                value={formData[obj.id] || []}
+                className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                onChange={(updatedValues) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    [obj.id]: updatedValues // Ensure documents persist
+                  }));
+                }}                
               />
               <InputError className="px-2" message={errors[obj.id]} />
             </div>
@@ -170,7 +191,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                     value={formData[obj.id] || false}
                     checked={formData[obj.id] || false}
                     onChange={(e) => {
-                        setFormData({...formData, [obj.id]: e.target.checked || ''})
+                      setFormData({...formData, [obj.id]: e.target.checked || ''})
                     }}
                     className="sr-only"
                   />
@@ -237,7 +258,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                   <DangerButton
                     key={buttonObj.id}
                     id={buttonObj.id}
-                    onClick={() => valuesCallback({})}
+                    onClick={() => {}}
                     className={buttonObj.className}
                   >{buttonObj.label}</DangerButton>
                 );

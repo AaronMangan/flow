@@ -12,7 +12,8 @@ class CreateNewDocumentRequest extends FormRequest
     public function authorize(): bool
     {
         // TODO: Replace with authorization logic
-        return true;
+        // return true;
+        return \Auth::user()->hasAnyRole(['admin', 'super']);
     }
 
     /**

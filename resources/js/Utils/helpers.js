@@ -1,4 +1,7 @@
 export const truncateText = (text, maxLength = 50) => {
+    if (text == null || typeof text == 'undefined' || text == '') {
+        return '';
+    }
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 

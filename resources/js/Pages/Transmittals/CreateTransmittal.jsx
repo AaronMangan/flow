@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
@@ -8,11 +8,39 @@ import { useState, useEffect } from 'react';
 import FormGen from '@/Components/FormGenerator/FormGen';
 
 export default function CreateTransmittal() {
-    const [transmittalStatuses, setTransmittalStatuses] = useState([]);
-
-    const addDocument = () => {
-        toast.warning('To Be Completed')
+    const [transmittalStatus, setTransmittalStatus] = useState([]);
+    const { data, setData, post, processing, reset, errors, clearErrors } = useForm({
+        to: [],
+        details: '',
+        documents: [],
+        transmittal_status: 1,
+    });
+    /**
+     * Submit the form and create the transmittal.
+     */
+    const submitForm = (e) => {
+        // e.preventDefault();
+        post(route('transmittal.store'), {
+            onSuccess: () => {},
+            onError: () => {
+                toast.error('An error occurred saving transmittal, please try again')
+            }
+        });
     }
+
+    /**
+     * Set the form values, which will be submitted to the server.
+     * @param {*} data 
+     */
+    const setFormValues = (values) => {
+        setData(null);
+        setData(values);
+    }
+
+    useEffect(() => {
+        // 
+    }, [data]);
+
     /**
      * Defines the form object used for the create transmittal form.
      */
@@ -20,14 +48,14 @@ export default function CreateTransmittal() {
         id: 'create_transmittal_form',
         title: 'Create Transmittal',
         titleClass: 'text-gray-600 text-xl',
-        contents: [  
+        contents: [
           {
             id: 'to',
-            type: 'text',
+            type: 'user_list',
             label: 'To',
             className: 'w-full',
             parentClassName: 'col-span-2 pr-2 w-full',
-            placeholder: 'Recipients'
+            placeholder: 'Recipients...'
           },
           {
             id: 'details',
@@ -47,11 +75,11 @@ export default function CreateTransmittal() {
             placeholder: 'Add documents to the transmittal'
           },
           {
-            id: 'transmittal_statuses',
+            id: 'transmittal_status',
             type: 'select',
             label: 'Status',
             className: 'w-full pr-2',
-            data: transmittalStatuses || [],
+            data: transmittalStatus || [],
             placeholder: 'Select a status'
           },
         ],
@@ -68,7 +96,7 @@ export default function CreateTransmittal() {
           {
             id: 'save_button',
             label: 'Save',
-            onClick: (e) => submitForm(),
+            onClick: (e) => submitForm(e),
             type: 'primary'
           }
         ]
@@ -77,7 +105,7 @@ export default function CreateTransmittal() {
     // Get the transmittal status from settings
     useEffect(() => {
         axios.get(route('metadata', {values: 'transmittal_statuses'})).then(res => {
-            setTransmittalStatuses(res?.data?.data?.transmittal_statuses?.map(ts => {
+            setTransmittalStatus(res?.data?.data?.transmittal_statuses?.map(ts => {
                 return {label: ts.name, value: ts.id}
             }) || []);
         }).catch(ex => {
@@ -91,24 +119,13 @@ export default function CreateTransmittal() {
                 <div className="py-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                            {/* <div className="p-6 text-gray-900 dark:text-gray-100">
-                                You're logged in!
-                            </div> */}
                             <div className="px-4 py-2">
                                 <FormGen
                                     config={formObj}
                                     className='grid grid-cols-2 gap-4 px-2'
-                                    valuesCallback={() => {}}
-                                    values={() => {
-                                        return {
-                                            transmittal_status: null
-                                        }
-                                    }}
-                                    errors={() => {
-                                        return {
-                                            transmittal_status: null
-                                        }
-                                    }}
+                                    valuesCallback={(val) => setFormValues({...data, ...val})}
+                                    values={data}
+                                    errors={() => {}}
                                     reset={null}
                                 />
                             </div>

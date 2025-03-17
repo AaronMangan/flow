@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\Transmittal\TransmittalController;
+use App\Http\Controllers\Public\PublicTransmittalController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -133,7 +134,17 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
  */
 Route::middleware(['role:super|admin', 'auth'])->group(function () {
     Route::get('/transmittals', [TransmittalController::class, 'index'])->name('transmittals');
-    Route::get('/transmittals/create', [TransmittalController::class, 'create'])->name('transmittals.create');
+    Route::get('/transmittals/create', [TransmittalController::class, 'create'])->name('transmittal.create');
+    Route::post('/transmittal/create', [TransmittalController::class, 'store'])->name('transmittal.store');
+    Route::post('/transmittal/{transmittal}/send', [TransmittalController::class, 'send'])->name('transmittal.send');
+});
+
+/**
+ * Public Transmittal Routes. These are used for the public to view and download the files.
+ */
+Route::middleware('signed')->controller(PublicTransmittalController::class)->group(function () {
+    Route::get('view-transmittal', 'show')->name('view.transmittal');
+    Route::post('acknowledge-transmittal', 'acknowledge')->name('acknowledge.transmittal');
 });
 
 // Add auth routes.
