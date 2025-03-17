@@ -23,6 +23,7 @@ return new class () extends Migration {
             $table->foreignId('status_id')->constrained('document_statuses');
 
             $table->dateTime('sent_at')->nullable();
+            $table->dateTime('acknowledged_at')->nullable();
             $table->timestamps();
         });
 

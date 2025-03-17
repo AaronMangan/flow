@@ -66,7 +66,7 @@ class SendTransmittal extends Command
             'body' => $transmittal->details ?? '',
             'from' => 'Flow Energy',
             'action' => [
-                'url' => URL::temporarySignedRoute('view-transmittal', now()->addDays($config['transmittal_expiry_days'] ?? 14), ['id' => $id]),
+                'url' => URL::temporarySignedRoute('view.transmittal', now()->addDays($config['transmittal_expiry_days'] ?? 14), ['id' => $id]),
                 'label' => 'View Transmittal'
             ],
             'limit' => $config['transmittal_email_limit']

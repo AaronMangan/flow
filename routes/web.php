@@ -142,8 +142,9 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
 /**
  * Public Transmittal Routes. These are used for the public to view and download the files.
  */
-Route::controller(PublicTransmittalController::class)->group(function () {
-    Route::get('view-transmittal', 'show')->name('view-transmittal');
+Route::middleware('signed')->controller(PublicTransmittalController::class)->group(function () {
+    Route::get('view-transmittal', 'show')->name('view.transmittal');
+    Route::post('acknowledge-transmittal', 'acknowledge')->name('acknowledge.transmittal');
 });
 
 // Add auth routes.
