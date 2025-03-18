@@ -42,7 +42,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
       case 'select':
         return (
           <div key={obj.id + '-parent'} className={obj.parentClassName}>
-            <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+            <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:bg-gray-800 dark:text-gray-200">{obj.label}</label>
             <SelectBox
               key={obj.id + '_' + index}
               id={obj.id}
@@ -63,7 +63,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
       case 'multiselect':
         return (
           <div key={obj.id + '-parent'} className={obj.parentClassName}>
-            <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+            <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
             <SelectBox
               isMulti={true}
               name={obj.id}
@@ -99,7 +99,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
         case 'label':
           return (
             <div key={obj.id} className={obj.parentClassName}>
-              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <span>: {formData[obj.id] || obj.value || ''}</span>
               <InputError className="px-2" message={errors[obj.id]} />
             </div>
@@ -107,12 +107,12 @@ export default function FormGen({ className, config, valuesCallback, values, err
         case 'textarea':
           return (
             <div key={obj.id} className={obj.parentClassName}>
-              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <textarea
                 id={obj.id}
                 name={obj.name}
                 placeholder={obj.placeholder || null}
-                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-[#1E1E2E] dark:text-gray-200 ` + obj.className}
                 onChange={(e) => {
                     setFormData({...formData, [obj.id]: e.target.value || ''});
                 }}
@@ -125,7 +125,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
         case 'date':
           return (
             <div key={obj.id} className="w-full pt-1 pr-4">
-              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <input
                 type="text"
                 id={obj.id}
@@ -143,7 +143,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
         case 'button_list':
           return (
             <div key={obj.id} className={obj.parentClassName}>
-              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <ButtonList
                 id={obj.id}
                 name={obj.name}
@@ -164,7 +164,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
         case 'user_list':
           return (
             <div key={obj.id} className={obj.parentClassName}>
-              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <UserSelector
                 value={formData[obj.id] || []}
                 className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
@@ -233,8 +233,8 @@ export default function FormGen({ className, config, valuesCallback, values, err
       {!loading && config && (
         <>
           {/* Start with the title block */}
-          <div className="py-2 mt-2 font-bold text-gray-900 dark:text-gray-100">
-            <h2 className={config.titleClass || ''}>{config.title}</h2>
+          <div className="py-2 mt-2 font-bold text-gray-900 dark:text-gray-200">
+            <h2 className={'dark:bg-gray-800 dark:text-gray-200 ' + config.titleClass || ''}>{config.title}</h2>
           </div>
 
           {/* Then, the contents block */}

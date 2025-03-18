@@ -98,7 +98,7 @@ const ButtonList = ({ id, className, valuesCallback, value }) => {
     }, [value])
 
     return (
-        <div className="w-full py-4 bg-white">
+        <div className="w-full py-4 bg-white dark:bg-gray-800 dark:text-gray-200">
             {/* Add Button */}
             <SecondaryButton onClick={() => setShowAddDocument(true)} className="flex items-center mb-4">
                 <PlusIcon className="w-4 h-4 mr-2" /> Add
@@ -110,7 +110,7 @@ const ButtonList = ({ id, className, valuesCallback, value }) => {
                     selectedDocuments.map((docId) => {
                         const docData = documentList.find((doc) => doc.id === docId);
                         return (
-                            <div key={docData?.id} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+                            <div key={docData?.id} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-gray-200">
                                 <div className="w-full">
                                     <div className="px-2">
                                         <div className="flex items-center">
@@ -130,9 +130,9 @@ const ButtonList = ({ id, className, valuesCallback, value }) => {
                         );
                     })
                 ) : (
-                    <div className="flex items-center justify-center p-3 bg-white rounded-lg">
-                        <CubeTransparentIcon className="w-4 h-4 mr-2 text-gray-500" />
-                        <div className="text-gray-500">No Items</div>
+                    <div className="flex items-center justify-center p-3 bg-white rounded-lg dark:bg-gray-800 dark:text-gray-200">
+                        <CubeTransparentIcon className="w-4 h-4 mr-2 text-gray-500 dark:bg-gray-800 dark:text-gray-200" />
+                        <div className="text-gray-500 dark:text-gray-200">No Items</div>
                     </div>
                 )}
             </div>

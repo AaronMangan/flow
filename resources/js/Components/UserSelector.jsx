@@ -1,19 +1,66 @@
 import Select from 'react-select';
-import { useEffect, useRef, useState } from "react";
-import { TrashIcon, PlusIcon, CubeTransparentIcon, EyeIcon } from "@heroicons/react/24/solid";
-import SecondaryButton from "./SecondaryButton";
-import DangerButton from "./DangerButton";
-import Modal from "./Modal";
-import TextInput from "./TextInput";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import TableView from "./TableView";
-import Checkbox from "./Checkbox";
-import PrimaryButton from "./PrimaryButton";
 
 export default function UserSelector({ value, className = '', children, options, onChange, ...props }) {
     const [userOptions, setUserOptions] = useState(options || []);
     const [selectedValues, setSelectedValues] = useState([]);
+    const [isDarkMode, setIsDarkMode] = useState(
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+    );
+
+    const darkStyles = {
+        control: (base) => ({
+          ...base,
+          backgroundColor: "#1E1E2E", // Dark background
+          borderColor: "#4A4A4A", // Darker border
+          color: "#E4E4E4", // Light text
+        }),
+        menu: (base) => ({
+          ...base,
+          backgroundColor: "#2E2E3E", // Dropdown menu background
+        }),
+        singleValue: (base) => ({
+          ...base,
+          color: "#E4E4E4", // Selected item color
+        }),
+        option: (base, { isFocused, isSelected }) => ({
+          ...base,
+          backgroundColor: isSelected ? "#4A4A4A" : isFocused ? "#3A3A4A" : "#2E2E3E",
+          color: "#FFFFFF",
+        }),
+        placeholder: (base) => ({
+          ...base,
+          color: "#B0B0B0", // Placeholder text color
+        }),
+    };
+      
+    const lightStyles = {
+        control: (base) => ({
+            ...base,
+            backgroundColor: "#FFFFFF",
+            borderColor: "#CCCCCC",
+            color: "#000000",
+        }),
+        menu: (base) => ({
+            ...base,
+            backgroundColor: "#FFFFFF",
+        }),
+        singleValue: (base) => ({
+            ...base,
+            color: "#000000",
+        }),
+        option: (base, { isFocused, isSelected }) => ({
+            ...base,
+            backgroundColor: isSelected ? "#DDD" : isFocused ? "#EEE" : "#FFF",
+            color: "#000",
+        }),
+        placeholder: (base) => ({
+            ...base,
+            color: "#777",
+        }),
+    };
     
     // Email validation function
     const validateEmail = (email) => {
@@ -52,11 +99,16 @@ export default function UserSelector({ value, className = '', children, options,
         }).catch(ex => {
             toast.error('An error occurred getting list of selectable users, please contact your administrator for assistance');
         })
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const handleChange = (e) => setIsDarkMode(e.matches);
+    
+        mediaQuery.addEventListener("change", handleChange);
+        return () => mediaQuery.removeEventListener("change", handleChange);
     }, []);
 
     {/* Return the component */}
     return (
-        <div className={`block text-sm font-medium text-gray-700 dark:text-gray-300 ` + className}>
+        <div className={`block text-sm font-medium text-gray-700 dark:text-gray-200 ` + className}>
             <Select
                 {...props}
                 options={userOptions}
@@ -66,7 +118,8 @@ export default function UserSelector({ value, className = '', children, options,
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 isClearable
-                className="w-full"
+                styles={isDarkMode ? darkStyles : lightStyles}
+                className="w-full dark:text-gray-200"
             />
         </div>
     );

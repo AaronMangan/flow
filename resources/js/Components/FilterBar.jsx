@@ -45,21 +45,21 @@ export default function FilterBar({ className, config, valuesCallback, values, .
         case 'select':
           return (
             <div key={obj.id} className="flex items-center px-2 space-x-2">
-              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <select
                 id={obj.id}
                 value={selectedFilters[obj.id]}
                 onChange={(e) => {
                   setSelectedFilters({...selectedFilters, [obj.id]: e.target.value || ''});
                 }}
-                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
+                className={`px-4 py-2 border border-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
               >
                 <option key='all' value="all">All</option>
                 
                 {/* Dynamically populate the options. */}
                 {apiData && (
                   apiData[obj.id]?.map(x => {
-                    return <option key={x.value} value={x.value}>{x.label}</option>;
+                    return <option key={x.value || x?.id} value={x.value || x?.id}>{x.label || x?.name}</option>;
                   })
                 )}
               </select>
@@ -68,14 +68,14 @@ export default function FilterBar({ className, config, valuesCallback, values, .
         case 'text':
           return (
             <div key={obj.id} className="flex items-center px-2 space-x-2">
-              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <input
                 type="text"
                 id={obj.id}
                 placeholder={obj.placeholder || null}
                 name={obj?.name || obj.id}
                 value={selectedFilters[obj.id] || ''}
-                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
+                className={`px-4 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 onChange={(e) => {
                   setSelectedFilters({...selectedFilters, [obj.id]: e.target.value || ''});
                 }}
@@ -85,13 +85,13 @@ export default function FilterBar({ className, config, valuesCallback, values, .
         case 'date':
           return (
             <div key={obj.id} className="flex items-center px-2 space-x-2">
-              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <label htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <input
                 type="text"
                 id={obj.id}
                 placeholder={obj.placeholder || null}
                 name={obj?.name || obj.id}
-                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
+                className={`px-4 py-2 border border-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 onChange={(e) => {
                   setSelectedFilters({...selectedFilters, [obj.id]: e.target.value || ''})
                 }}
@@ -108,9 +108,9 @@ export default function FilterBar({ className, config, valuesCallback, values, .
                 onChange={(e) => {
                   setSelectedFilters({...selectedFilters, [obj.id]: e.target.checked || false})
                 }}
-                className="w-4 h-4 text-blue-500 focus:ring-2 focus:ring-blue-500"
+                className="w-4 h-4 text-blue-500 dark:text-white focus:ring-2 focus:ring-blue-500"
               />
-              <label htmlFor={obj.id} className="text-sm font-medium text-gray-600">{obj.label}</label>
+              <label htmlFor={obj.id} className="text-sm font-medium text-gray-600 dark:text-gray-800">{obj.label}</label>
             </div>
           );
         default:
@@ -119,7 +119,7 @@ export default function FilterBar({ className, config, valuesCallback, values, .
   }
 
   return (
-    <div className={`w-full flex flex-wrap items-center p-4 bg-white mr-auto rounded-lg shadow-md ` + className}>
+    <div className={`w-full flex flex-wrap items-center p-4 bg-white dark:text-gray-100 dark:bg-gray-800 mr-auto rounded-lg shadow-md ` + className}>
       {config && config.map((c) => renderInput(c))}
     </div>
   );
