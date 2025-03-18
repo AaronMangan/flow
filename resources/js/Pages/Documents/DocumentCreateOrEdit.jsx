@@ -281,10 +281,10 @@ export default function DocumentCreateOrEdit ({ document, messages }) {
           <div className="py-12">
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
               <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                <div className="px-6 text-gray-900 dark:text-gray-100">
+                <div className="px-6 text-gray-900 dark:text-gray-200">
                   <FormGen
                     config={formObj}
-                    className='grid grid-cols-2 gap-4'
+                    className='grid grid-cols-2 gap-4 dark:bg-gray-800 dark:text-gray-200'
                     valuesCallback={updateFormData}
                     values={data}
                     errors={errors}

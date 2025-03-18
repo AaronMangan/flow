@@ -35,6 +35,11 @@ export default function ViewDocuments({ documents, messages }) {
       width: '15pc',
     },
     {
+      name: 'Rev.',
+      selector: row => row?.revision?.code || row?.revision_id,
+      width: '5pc',
+    },
+    {
       name: 'Name',
       selector: row => row.name ?? null,
     },
@@ -113,39 +118,6 @@ export default function ViewDocuments({ documents, messages }) {
     })
   }
 
-  /**
-   * Save the area
-   * @param {*} e 
-   */
-  const postDocument = (e) => {
-    e.preventDefault();
-    if(activeDocument?.id) {
-        post(route('area.update', {area: activeDocument}), {
-            onSuccess: () => {
-                toast.success('Document updated successfully');
-                setShowDocumentDetails(false);
-                setActiveDocument(null);
-                refreshData();
-            },
-            onError: () => {
-                toast.error('An error occurred, please contact your administrator');
-            },
-        });
-    } else {
-      post(route('area.create'), {
-        onSuccess: () => {
-          toast.success('Document created successfully!');
-          setActiveDocument(null);
-          setShowDocumentDetails(false);
-          refreshData();
-        },
-        onError: () => {
-            toast.error('An error occurred, please contact your administrator for assistance');
-        }
-      })
-    }
-  }
-
   const deleteDocument = (id) => {
     axios.delete(route('area.destroy', {area: id})).then((response) => {
         if(response?.status == 200) {
@@ -175,6 +147,14 @@ export default function ViewDocuments({ documents, messages }) {
       className: 'w-[300px]',
       placeholder: 'Enter search'
     },
+    {
+      id: 'discipline',
+      type: 'select',
+      label: 'Discipline',
+      className: 'w-[300px]',
+      placeholder: 'Filter by discipline...',
+      endpoint: route('api.disciplines')
+    },
   ];
 
   useEffect(() => {
@@ -203,9 +183,9 @@ export default function ViewDocuments({ documents, messages }) {
     <AuthenticatedLayout>
     <Head title="Documents" />
       <>
-        <div className="py-12">
+        <div className="py-12 dark:bg-gray-900">
           <div className="w-full mx-auto sm:px-6 lg:px-8">
-            <div className="overflow-hidden sm:rounded-lg dark:bg-gray-800">
+            <div className="overflow-hidden dark:text-gray-100 dark:bg-gray-900">
             {(!documents || documents.length <= 0) && (
                 <>
                   <ExclamationCircleIcon className="w-16 h-16 mx-auto text-center text-gray-500" />
@@ -223,7 +203,7 @@ export default function ViewDocuments({ documents, messages }) {
                       data={documents}
                       columns={documentColumns}
                       customStyles={customStyles}
-                      className='rounded-lg'
+                      className=''
                     />
                   </div>
                 </div>
