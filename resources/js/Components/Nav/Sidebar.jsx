@@ -204,7 +204,7 @@ const Sidebar = ({ user }) => {
 
   return (
     <div className={`flex-col fixed h-full ${collapsed ? 'w-15' : 'w-[300px] z-20'} bg-gray-800 text-white transition-all duration-300`}>
-      <div className="flex items-center justify-center w-full px-1 py-2 pr-2 mt-2 space-x-4 h-15 hover:bg-gray-700">
+      <div className="flex items-center justify-between w-full px-2 py-2 pr-2 mt-2 space-x-4 h-15 hover:bg-gray-700">
         { !collapsed && 
           <img
             src={user?.profile_image || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp'} // Gravatar default image
@@ -213,9 +213,14 @@ const Sidebar = ({ user }) => {
             onClick={() => {goToPath('/profile')}}
           />
         }
-        {!collapsed && <span className="w-full text-lg font-bold text-white">{user?.name}</span>}
+        {!collapsed && 
+          <div className='justify-start w-full py-0'>
+            <span className="w-full text-lg font-bold text-white">{user?.name}</span><br/>
+            <span className="w-full text-xs text-white">{user?.organisation?.name}</span>
+          </div>
+        }
         
-        <button onClick={toggleSidebar} className="text-white focus:outline-none">{!collapsed && <XMarkIcon className="w-7 h-7"/> || <ChevronDoubleRightIcon className="pl-1 w-7 h-7"/>}</button>
+        <button onClick={toggleSidebar} className="self-start justify-end text-white focus:outline-none">{!collapsed && <XMarkIcon className="w-7 h-7"/> || <ChevronDoubleRightIcon className="pl-1 w-7 h-7"/>}</button>
       </div>
       <nav className="mt-6">
         <ul>
