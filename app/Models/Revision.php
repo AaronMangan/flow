@@ -12,9 +12,13 @@ class Revision extends Model
     use SoftDeletes;
     use LogsActivity;
 
-    //
+    // Properties of the model that can be set by users, through forms, etc
     protected $fillable = [
-        'name', 'code', 'description', 'draft', 'organisation_id', 'user_id'
+        'name', 'code', 'description', 'draft', 'organisation_id', 'user_id', 'weight'
+    ];
+
+    protected $casts = [
+        'draft' => 'boolean'
     ];
 
     /**

@@ -2,8 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
-import SecondaryButton from '@/Components/SecondaryButton';
+import FormGen from '@/Components/FormGenerator/FormGen';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
@@ -59,9 +58,9 @@ export default function ViewDisciplines({ disciplines }) {
             <PrimaryButton
                 id={'edit_' + row?.id}
                 onClick={(e) => {
-                    setActiveDiscipline(null);
-                    setActiveDiscipline({...row, ...{draft: row.draft == 'Yes' ? true : false}})
-                    setShowCreateDiscipline(true);
+                  setActiveDiscipline({ name: '', code: '', description: '' });
+                  setActiveDiscipline({...row, ...{draft: row.draft == 'Yes' ? true : false}})
+                  setShowCreateDiscipline(true);
                 }}
                 className='mr-2'
             >Edit</PrimaryButton>
@@ -69,7 +68,7 @@ export default function ViewDisciplines({ disciplines }) {
               id={'delete_' + row?.id}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveDiscipline(null);
+                setActiveDiscipline({ name: '', code: '', description: '' });
                 setActiveDiscipline(row);
                 deleteDiscipline(row.id);
               }}
@@ -95,30 +94,56 @@ export default function ViewDisciplines({ disciplines }) {
     }
   };
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'code',
-      type: 'text',
-      label: 'Code',
-      placeholder: 'Please enter a code',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'description',
-      type: 'textarea',
-      label: 'Description',
-      placeholder: '[Optional] Description...',
-      className: 'w-full m-2',
-      rows: 5
-    }
-  ];
+  const formObj = {
+    id: 'discipline-form',
+    title: activeDiscipline && activeDiscipline?.id > 0 ? 'Edit ' + activeDiscipline?.name : 'Add New Discipline',
+    titleClass: 'text-gray-600 text-xl',
+    contents: [
+      {
+        id: 'name',
+        type: 'text',
+        label: 'Name',
+        placeholder: 'Please enter a name',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+      },
+      {
+        id: 'code',
+        type: 'text',
+        label: 'Code',
+        placeholder: 'Please enter a code',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+      },
+      {
+        id: 'description',
+        type: 'textarea',
+        label: 'Description',
+        placeholder: '[Optional] Description...',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+        rows: 5
+      }
+    ],
+    buttons: [
+      {
+        id: 'close_button',
+        label: 'Close',
+        onClick: () => {
+          closeModal();
+        },
+        type: 'danger'
+      },
+      {
+        id: 'save_button',
+        label: 'Save',
+        onClick: (e) => {
+          postDiscipline(e);
+        },
+        type: 'primary'
+      },
+    ]
+  };
 
   /**
    * Update the form data with the data from the form generator
@@ -133,9 +158,8 @@ export default function ViewDisciplines({ disciplines }) {
    * Close Modal
    */
   const closeModal = () => {
-    setActiveDiscipline(null);
-    setActiveDiscipline({ name: '', code: '', description: '' })
     setShowCreateDiscipline(false);
+    setActiveDiscipline({ name: '', code: '', description: '' });
   }
 
   /**
@@ -158,7 +182,7 @@ export default function ViewDisciplines({ disciplines }) {
             onSuccess: () => {
                 toast.success('Discipline updated successfully');
                 setShowCreateDiscipline(false);
-                setActiveDiscipline(null);
+                setActiveDiscipline({ name: '', code: '', description: '' });
                 refreshData();
             },
             onError: () => {
@@ -169,7 +193,7 @@ export default function ViewDisciplines({ disciplines }) {
       post(route('discipline.create'), {
         onSuccess: () => {
           toast.success('Discipline created successfully!');
-          setActiveDiscipline(null);
+          setActiveDiscipline({ name: '', code: '', description: '' });
           setShowCreateDiscipline(false);
           refreshData();
         },
@@ -219,31 +243,16 @@ export default function ViewDisciplines({ disciplines }) {
 
       {/* Create a new setting modal */}
       <Modal show={showCreateDiscipline} onClose={closeModal}>
-        <form onSubmit={(e) => {postDiscipline(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {activeDiscipline && activeDiscipline?.id > 0 ? 'Edit ' + activeDiscipline?.name : 'Add New Discipline'}
-          </h2>
-          <FormGenerator
-            className='w-full'
+        <div className='grid pb-1'>
+          <FormGen
             config={formObj}
+            className='grid grid-cols-2 gap-1 px-4 py-2 dark:bg-gray-800 dark:text-gray-200'
             valuesCallback={updateFormData}
             values={activeDiscipline}
             errors={errors}
+            reset={reset}
           />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+        </div>
       </Modal>
     </AuthenticatedLayout>
   );

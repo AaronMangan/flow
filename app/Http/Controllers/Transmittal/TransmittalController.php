@@ -10,6 +10,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Transmittals\CreateTransmittalRequest;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\URL;
+use App\Models\Config;
+use App\Mail\SendTransmittalEmail;
+use Illuminate\Support\Facades\Mail;
 
 class TransmittalController extends Controller
 {
@@ -169,7 +173,49 @@ class TransmittalController extends Controller
      */
     public function send(Request $request, Transmittal $transmittal)
     {
-        //
-        dd($transmittal);
+        $transmittal = $transmittal->load('documents', 'documents.revision', 'documents.document_status');
+        if (!isset($transmittal->id) || $transmittal->documents->count() <= 0 || !isset($transmittal->organisation_id) || !isset($transmittal->to)) {
+            return Inertia::render('Transmittals/TransmittalIndex', [
+                'transmittals' => $this->getTransmittals($request->all()),
+                'messages' => [
+                    'error' => 'An error occurred and the transmittal could not be issued. Please contact your administrator for support.'
+                ]
+            ]);
+        }
+
+        /* Get the limit of documents that are displayed on a transmittal */
+        $config = Config::where('organisation_id', $transmittal->organisation_id)->where('key', 'organisation_settings')->first()->values;
+
+        /* Prepare a details array, with information needed to prepare a transmittal */
+        $details = [
+            'to' => implode("; ", $transmittal->to),
+            'addressee' => 'Document Controller',
+            'body' => $transmittal->details ?? '',
+            'from' => $config['email_from'] ?? $request->user()->email,
+            'action' => [
+                'url' => URL::temporarySignedRoute('view.transmittal', now()->addDays($config['transmittal_expiry_days'] ?? 14), ['id' => $transmittal->id]),
+                'label' => 'View Transmittal'
+            ],
+            'limit' => $config['transmittal_email_limit'] ?? 50
+        ];
+
+        try {
+            // Send the email
+            $mailed = \Mail::to($details['to'])->send(new SendTransmittalEmail($details, $transmittal));
+
+            if ($mailed) {
+                $transmittal->sent_at = now();
+                $transmittal->save();
+
+                return Inertia::render('Transmittals/TransmittalIndex', [
+                    'transmittals' => $this->getTransmittals($request->all()),
+                    'messages' => [
+                        'success' => 'The transmittal was sent successfully!'
+                    ]
+                ]);
+            }
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
     }
 }

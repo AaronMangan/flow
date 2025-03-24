@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\Query\Builder;
 
 class StoreRevisionRequest extends FormRequest
 {
@@ -33,7 +35,17 @@ class StoreRevisionRequest extends FormRequest
             ],
             'draft' => [
                 'boolean', 'nullable'
-            ]
+            ],
+            'weight' => [
+                'integer', 'nullable', Rule::unique('revisions')->where(fn (Builder $query) => $query->where('organisation_id', \Auth::user()->organisation_id))
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'weight.unique' => 'This weight is already being used, please use another value'
         ];
     }
 }

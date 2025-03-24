@@ -4,7 +4,7 @@ import DangerButton from '@/Components/DangerButton';
 import TableView from '@/Components/TableView';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head } from '@inertiajs/react';
-import { EyeIcon, UserIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, TrashIcon, UserIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { truncateText } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
 import FloatingButton from '@/Components/FloatingButton';
@@ -22,10 +22,23 @@ export default function TransmittalIndex({ transmittals, messages }) {
     }
 
     /**
-     * 
+     * Validates & Sends the transmittal to its selected recipients.
      */
-    const sendTransmittal = (id) => {
-        axios.post(route('transmittal.send', {transmittal: id})).then(res => {}).catch(ex => console.error(ex))
+    const sendTransmittal = (e, id) => {
+        e.preventDefault();
+        axios.post(route('transmittal.send', {transmittal: id})).catch(ex => console.error(ex))
+    }
+
+    const deleteTx = (e, row) => {
+        e.preventdefault();
+        // The transmittal has already been sent, so it cannot be deleted.
+        if(row?.sent_at && (row?.sent_at != null || typeof row?.sent_at != 'undefined')) {
+            toast.warning('Transmittals that have been sent cannot be deleted, please contact your administrator for assistance');
+            return;
+        } else {
+            // If it hasn't been issued yet, it can be deleted.
+            toast.error('TODO: Delete unsent transmittals');
+        }
     }
 
     /**
@@ -78,7 +91,6 @@ export default function TransmittalIndex({ transmittals, messages }) {
                 );
             },
             width: '10pc',
-            // center: true
         },
         {
             name: 'Details',
@@ -103,31 +115,52 @@ export default function TransmittalIndex({ transmittals, messages }) {
                             <EyeIcon className="w-3 h-3 mr-2"/>View
                         </SecondaryButton>
                         {row?.sent_at === null && (
-                            <PrimaryButton
-                                id={'send_' + row?.id}
-                                onClick={(e) => {
-                                    sendTransmittal(row?.id);
-                                }}
-                                className='mr-2'
-                            >
-                                <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Send
-                            </PrimaryButton>
+                            <>
+                                <div>
+                                    <PrimaryButton
+                                        id={'send_' + row?.id}
+                                        onClick={(e) => {
+                                            sendTransmittal(e, row?.id);
+                                        }}
+                                        className='mr-2'
+                                    >
+                                        <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Send
+                                    </PrimaryButton>
+                                </div>
+                            </>
                         )}
                         {row?.sent_at !== null && (
-                            <DangerButton
-                                id={'send_' + row?.id}
-                                onClick={(e) => {
-                                    sendTransmittal(row?.id);
-                                }}
-                                className='mr-2'
-                            >
-                                <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Resend
-                            </DangerButton>
+                            <div>
+                                <Tooltip text='Re-issue the transmittal with the exact documents and revisions'>
+                                    <DangerButton
+                                        id={'send_' + row?.id}
+                                        onClick={(e) => {
+                                            sendTransmittal(row?.id);
+                                        }}
+                                        className='mr-2'
+                                    >
+                                        <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Resend
+                                    </DangerButton>
+                                </Tooltip>
+                            </div>
                         )}
+                        <div>
+                            <Tooltip text='Issued transmittals cannot be deleted. Please contact your administrator if you need assistance'>
+                                <DangerButton
+                                    disabled={(row?.sent_at != null) ? true : false}
+                                    id={'send_' + row?.id}
+                                    onClick={(e) => {
+                                        deleteTx(e, row)
+                                    }}
+                                    className='mr-2'
+                                >
+                                    <TrashIcon className="w-3 h-3 mr-2"/> Delete
+                                </DangerButton>
+                            </Tooltip>
+                        </div>
                     </>
                 );
             },
-            // right: 'true',
         }
     ];
 

@@ -67,6 +67,8 @@ class MyModel extends Model {
 
 ```
 
+The history is kept in a table called `activity_logs` and keeps a record of the post change properties, i.e. what they were changed to. This can be compared to previous entries to build a change history.
+
 ## API Usage
 
 While base is primarily a web application template, it does include some API capability. This has been designed to allow to make stateless calls to your backend when needed. A good example is the **Status** metadata, which can be useful to apply to different objects in your application. You can check out the `routes/api.php` file to get a better understanding of how this has been setup and what you can do.

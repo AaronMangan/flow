@@ -10,7 +10,7 @@ class TransmittalPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(Transmittal $transmittal): bool
+    public function viewAny(User $user): bool
     {
         // Confirm the user can view any transmittals
         return (\Auth::user()->hasAnyRole(['super', 'admin', 'user']))

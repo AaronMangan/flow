@@ -11,7 +11,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user): Response
     {
         // Confirm the user can view any revisions
         return (\Auth::user()->hasAnyRole(['super', 'admin', 'user']))
@@ -22,7 +22,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Revision $revision): bool
+    public function view(User $user, Revision $revision): Response
     {
         // If the user is a super user.
         if (\Auth::user()->hasAnyRole(['super'])) {
@@ -40,7 +40,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
         return \Auth::user()->hasAnyRole(['super', 'admin'])
             ? Response::allow()
@@ -50,7 +50,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Revision $revision): bool
+    public function update(User $user, Revision $revision): Response
     {
         //
     }
@@ -58,7 +58,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Revision $revision): bool
+    public function delete(User $user, Revision $revision): Response
     {
         // Super role can delete any user.
         if ($user->hasRole('super')) {
@@ -74,7 +74,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Revision $revision): bool
+    public function restore(User $user, Revision $revision): Response
     {
         //
     }
@@ -82,7 +82,7 @@ class RevisionPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Revision $revision): bool
+    public function forceDelete(User $user, Revision $revision): Response
     {
         //
     }

@@ -1,3 +1,6 @@
+/**
+ * @description THIS FORM GENERATOR VERSION IS DEPRECIATED. PLEASE USE '../FormGenerator/FormGen.jsx';
+ */
 import React, { useEffect, useState } from 'react';
 import InputError from './InputError';
 

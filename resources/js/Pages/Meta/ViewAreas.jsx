@@ -2,8 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
-import SecondaryButton from '@/Components/SecondaryButton';
+import FormGen from '@/Components/FormGenerator/FormGen';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
@@ -59,9 +58,8 @@ export default function ViewAreas({ areas }) {
             <PrimaryButton
                 id={'edit_' + row?.id}
                 onClick={(e) => {
-                    setActiveArea(null);
-                    setActiveArea({...row, ...{draft: row.draft == 'Yes' ? true : false}})
-                    setShowCreateArea(true);
+                  setActiveArea({...row, ...{draft: row.draft == 'Yes' ? true : false}})
+                  setShowCreateArea(true);
                 }}
                 className='mr-2'
             >Edit</PrimaryButton>
@@ -69,7 +67,7 @@ export default function ViewAreas({ areas }) {
               id={'delete_' + row?.id}
               onClick={(e) => {
                 e.preventDefault();
-                setActiveArea(null);
+                setActiveArea({ name: '', code: '', description: '' })
                 setActiveArea(row);
                 deleteArea(row.id);
               }}
@@ -95,30 +93,57 @@ export default function ViewAreas({ areas }) {
     }
   };
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'code',
-      type: 'text',
-      label: 'Code',
-      placeholder: 'Please enter a code',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'description',
-      type: 'textarea',
-      label: 'Description',
-      placeholder: '[Optional] Description...',
-      className: 'w-full m-2',
-      rows: 5
-    }
-  ];
+    /**
+     * Controls what form is displayed to the user.
+     */
+    const formObj = {
+      id: 'area-form',
+      title: activeArea && activeArea?.id > 0 ? 'Edit ' + activeArea?.name : 'Add New Area',
+      titleClass: 'text-gray-600 text-xl',
+      contents: [
+        {
+          id: 'name',
+          type: 'text',
+          label: 'Name',
+          placeholder: 'Please enter a name',
+          className: 'w-full',
+          parentClassName: 'col-span-2 w-full',
+        },
+        {
+          id: 'code',
+          type: 'text',
+          label: 'Code',
+          placeholder: 'Please enter a code',
+          className: 'w-full',
+          parentClassName: 'col-span-2 pt-1 w-full',
+        },
+        {
+          id: 'description',
+          type: 'textarea',
+          label: 'Description',
+          placeholder: '[Optional] Description...',
+          className: 'w-full',
+          parentClassName: 'col-span-2 pt-1 w-full',
+          rows: 5
+        }
+      ],
+      buttons: [
+        {
+          id: 'close_button',
+          label: 'Close',
+          onClick: () => {
+            closeModal()
+          },
+          type: 'danger'
+        },
+        {
+          id: 'save_button',
+          label: 'Save',
+          onClick: (e) => postArea(e),
+          type: 'primary'
+        },
+      ]
+    };
 
   /**
    * Update the form data with the data from the form generator
@@ -133,7 +158,6 @@ export default function ViewAreas({ areas }) {
    * Close Modal
    */
   const closeModal = () => {
-    setActiveArea(null);
     setActiveArea({ name: '', code: '', description: '' })
     setShowCreateArea(false);
   }
@@ -158,7 +182,7 @@ export default function ViewAreas({ areas }) {
             onSuccess: () => {
                 toast.success('Area updated successfully');
                 setShowCreateArea(false);
-                setActiveArea(null);
+                setActiveArea({ name: '', code: '', description: '' })
                 refreshData();
             },
             onError: () => {
@@ -169,7 +193,7 @@ export default function ViewAreas({ areas }) {
       post(route('area.create'), {
         onSuccess: () => {
           toast.success('Area created successfully!');
-          setActiveArea(null);
+          setActiveArea({ name: '', code: '', description: '' })
           setShowCreateArea(false);
           refreshData();
         },
@@ -219,31 +243,16 @@ export default function ViewAreas({ areas }) {
 
       {/* Create a new setting modal */}
       <Modal show={showCreateArea} onClose={closeModal}>
-        <form onSubmit={(e) => {postArea(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {activeArea && activeArea?.id > 0 ? 'Edit ' + activeArea?.name : 'Add New Area'}
-          </h2>
-          <FormGenerator
-            className='w-full'
+        <div className='grid pb-1'>
+          <FormGen
             config={formObj}
+            className='grid grid-cols-2 gap-1 px-4 py-2 dark:bg-gray-800 dark:text-gray-200'
             valuesCallback={updateFormData}
             values={activeArea}
             errors={errors}
+            reset={reset}
           />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+        </div>
       </Modal>
     </AuthenticatedLayout>
   );
