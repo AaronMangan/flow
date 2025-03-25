@@ -1,6 +1,6 @@
 # Flow - Next Generation Document Management
 
-<quote>*Flow is a next-gen document management system, that allows you to keep track of all your project/s documentation as control it's versions!*</quote>
+<quote>*Flow is a next-gen document management system, that allows you to keep track of all your project/s documentation and control it's versions!*</quote>
 
 **Why?**
 
