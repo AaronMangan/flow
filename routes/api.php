@@ -200,11 +200,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
      * Returns tags for orgs that use them
      */
     Route::middleware(['role:super|admin', 'config:tags'])->get('/tags', function (Request $request) {
-        // Confirm the user can make the request.
-        if ($request->user()->cannot('viewAny', \App\Models\Tag::class)) {
-            abort(403);
-        }
-
         $query = \App\Models\Tag::query();
 
         if ($request->has('search')) {

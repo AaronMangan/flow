@@ -2,10 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
-import Modal from '@/Components/Modal';
+// import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
 import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
@@ -157,6 +156,7 @@ export default function ViewDocuments({ documents, messages }) {
     },
   ];
 
+  // Runs when filters change.
   useEffect(() => {
     if(typeof filters.search !== 'undefined') {
       router.visit('documents?search=' + filters?.search || '', {
@@ -167,6 +167,7 @@ export default function ViewDocuments({ documents, messages }) {
     }
   }, [filters]);
 
+  // Runs when the component is mounted.
   useEffect(() => {
     if(messages && messages.success) {
       toast.success(messages.success)
@@ -214,51 +215,11 @@ export default function ViewDocuments({ documents, messages }) {
 
         {/* Allows users add a new document */}
         <FloatingButton className="bg-gray-800" onClick={
-          () => {setShowDocumentDetails(true)}
+          () => {
+            router.visit(route('documents.create'))
+          }
         }/>
       </>
-
-      {/* Create a new setting modal */}
-      <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
-        <div className='px-4 py-4 overflow-y'>
-          <dl className="grid grid-cols-1 gap-x-8 gap-y-4">
-            <div>
-              <dt className="font-bold text-gray-900">Document Number</dt>
-              <dd className="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Title</dt>
-              <dd className="text-gray-600">{activeDocument.name}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Area</dt>
-              <dd className="text-gray-600">{activeDocument?.area?.name}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Discipline</dt>
-              <dd className="text-gray-600">{activeDocument.discipline?.name}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Type</dt>
-              <dd className="text-gray-600">{activeDocument?.type?.name}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Revision</dt>
-              <dd className="text-gray-600">{activeDocument?.revision?.code}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-gray-900">Status</dt>
-              <dd className="text-gray-600">{activeDocument?.document_status?.name}</dd>
-            </div>
-            <div className='text-right'>
-              <PrimaryButton className="" onClick={closeModal}>
-                <XMarkIcon className="w-3 h-3 mr-2"/>
-                Close
-              </PrimaryButton>
-            </div>
-          </dl>
-        </div>
-      </Modal>
     </AuthenticatedLayout>
   );
 }

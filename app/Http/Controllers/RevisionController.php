@@ -38,7 +38,7 @@ class RevisionController extends Controller
         }
 
         // Get the validated data.
-        $data = $request->safe()->only(['name', 'code', 'description', 'draft']);
+        $data = $request->safe()->only(['name', 'code', 'description', 'draft', 'weight']);
 
         // Create the new revision.
         $rev = Revision::create([
@@ -47,7 +47,8 @@ class RevisionController extends Controller
             'description' => $data['description'] ?? null,
             'draft' => $data['draft'] ?? false,
             'organisation_id' => \Auth::user()->organisation_id,
-            'user_id' => \Auth::user()->id
+            'user_id' => \Auth::user()->id,
+            'weight' => $data['weight'] ?? null
         ]);
 
         return Inertia::render('Meta/ViewRevisions', [
@@ -77,7 +78,7 @@ class RevisionController extends Controller
      */
     public function update(StoreRevisionRequest $request, Revision $revision)
     {
-        $data = $request->safe()->only(['name', 'code', 'description', 'draft']);
+        $data = $request->safe()->only(['name', 'code', 'description', 'draft', 'weight']);
         $result = $revision->update($data);
 
         return Inertia::render('Meta/ViewRevisions', [

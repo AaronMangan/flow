@@ -22,6 +22,7 @@ import PrimaryButton from '../PrimaryButton';
 import DangerButton from '../DangerButton';
 import ButtonList from '../ButtonList';
 import UserSelector from '../UserSelector';
+import Checkbox from '../Checkbox';
 
 export default function FormGen({ className, config, valuesCallback, values, errors, reset, ...props }){
   const [loading, setLoading] = useState(true);
@@ -88,7 +89,25 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 placeholder={obj.placeholder || null}
                 name={obj?.name || obj.id}
                 value={formData[obj.id] || ''}
-                className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
+                onChange={(e) => {
+                  setFormData({...formData, [obj.id]: e.target.value || ''});
+                }}
+              />
+              <InputError className="px-2" message={errors[obj.id]} />
+            </div>
+          );
+        case 'number':
+          return (
+            <div key={obj.id} className={obj.parentClassName}>
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600">{obj.label}</label>
+              <TextInput
+                type="number"
+                id={obj.id}
+                placeholder={obj.placeholder || null}
+                name={obj?.name || obj.id}
+                value={formData[obj.id] || 0}
+                className={`border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 onChange={(e) => {
                   setFormData({...formData, [obj.id]: e.target.value || ''});
                 }}
@@ -112,7 +131,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 id={obj.id}
                 name={obj.name}
                 placeholder={obj.placeholder || null}
-                className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-[#1E1E2E] dark:text-gray-200 ` + obj.className}
+                className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1E1E2E] dark:text-gray-200 ` + obj.className}
                 onChange={(e) => {
                     setFormData({...formData, [obj.id]: e.target.value || ''});
                 }}
@@ -131,7 +150,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 id={obj.id}
                 placeholder={obj.placeholder || null}
                 name={obj?.name || obj.id}
-                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                className={`px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 onChange={(e) => {
                   setFormData({...formData, [obj.id]: e.target.value || ''})
                 }}
@@ -148,7 +167,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                 id={obj.id}
                 name={obj.name}
                 placeholder={obj.placeholder || null}
-                className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                className={`py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 rows={obj.rows || 3}
                 value={formData[obj.id] || []}
                 valuesCallback={(updatedValues) => {
@@ -167,7 +186,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
               <label key={obj.id + '_label'} htmlFor={obj.label} className="text-sm font-bold text-gray-600 dark:text-gray-200">{obj.label}</label>
               <UserSelector
                 value={formData[obj.id] || []}
-                className={`py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 ` + obj.className}
+                className={`py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
                 onChange={(updatedValues) => {
                   setFormData((prev) => ({
                     ...prev,
@@ -179,6 +198,18 @@ export default function FormGen({ className, config, valuesCallback, values, err
             </div>
           );
         case 'checkbox':
+          return (
+            <div key={obj.id + '_' + obj.type} className="flex items-center justify-start">
+              <Checkbox
+                id={obj.id}
+                name={obj.id}
+                className={`py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ` + obj.className}
+              />
+              <label key={obj.id + '_label'} htmlFor={obj.label} className="pl-3 text-sm font-bold text-gray-600">{obj.label}</label>
+              <InputError className="px-2" message={errors[obj.id]} />
+            </div>
+          );
+        case 'switch':
           return (
             <div key={obj.id + '_' + obj.type} className="flex items-center justify-start">
               <label key={obj.id + '_label'} htmlFor={obj.label} className="pr-3 text-sm font-bold text-gray-600">{obj.label}</label>
@@ -196,7 +227,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                     className="sr-only"
                   />
                   <div
-                    className={`w-12 h-6 rounded-full ${formData[obj.id] ? 'bg-teal-500' : 'bg-gray-300'} transition-colors`}
+                    className={`w-12 h-6 rounded-full ${formData[obj.id] ? 'bg-blue-500' : 'bg-gray-300'} transition-colors`}
                   ></div>
                   {/* Knob */}
                   <div
@@ -241,7 +272,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
           {config?.contents?.map((c) => renderInput(c))}
 
           {/* Finally, any buttons */}
-          <div className="inline-flex justify-between w-full col-span-2 py-3 pb-4 text-gray-900 dark:text-gray-100">
+          <div className="inline-flex justify-between w-full col-span-2 pt-2 mr-2 text-gray-900 dark:text-gray-100">
             {config?.buttons?.map((buttonObj) => {
               switch (buttonObj?.type) {
               case 'primary':
@@ -249,7 +280,7 @@ export default function FormGen({ className, config, valuesCallback, values, err
                     <PrimaryButton
                       key={buttonObj.id}
                       id={buttonObj.id}
-                      onClick={() => buttonObj.onClick()}
+                      onClick={(e) => buttonObj.onClick(e)}
                       className={buttonObj.className}
                     >{buttonObj.label}</PrimaryButton>
                   );
@@ -258,12 +289,12 @@ export default function FormGen({ className, config, valuesCallback, values, err
                   <DangerButton
                     key={buttonObj.id}
                     id={buttonObj.id}
-                    onClick={() => {}}
+                    onClick={(e) => buttonObj.onClick(e)}
                     className={buttonObj.className}
                   >{buttonObj.label}</DangerButton>
                 );
               default:
-                return null; // or some default button if needed
+                return null; // Or some default button if needed
               }
             })}
           </div>

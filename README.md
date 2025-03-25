@@ -1,74 +1,165 @@
-# Base
+# Flow - Next Generation Document Management
 
-Base is a template repository that can be used to quickly scaffold web applications. It includes everything you need to get started on building your software dreams!! 
+<quote>*Flow is a next-gen document management system, that allows you to keep track of all your project/s documentation as control it's versions!*</quote>
 
-It's built on Laravel and React to provide a familiar experience and let you focus on the important stuff.
+**Why?**
 
-The idea is that it's a boilerplate for a multi-tenancy web application that provides a lot of the basic items that you'd probably be adding anyway. It is however, only a template - you are free to change, add, remove whatever you like from your app.
+### *Why are documents "controlled"?*
 
-## What's Included
+At it's most basic level, documents are controlled when it is important to know that you have the latest version (revision). This becomes particularly relevant in an engineering environment because when an entity is building something, either physically or in design, it is common for changes to take place (for a myriad of reasons). When a change is made the recipients of the original document need to be made aware of the new revision so that they can action it accordingly.
 
-Base includes the following built in items:
+Changes in documents can also have other effects:
 
-- Standard Laravel (11)
-- Dashboard
-- User Management
-- Permissions (via Spatie Permissions)
-- (Some) Prebuilt Components
-- Navigation
-- Some Basic Metadata (Statuses)
-- Soft Deleting
+- Variations: If a document was used as a basis to price something and it changes, it's fair to say that the price may also change. This is known as a variation.
+- Capacity: When changed, the capacity of the recipient to perform an action based off the document may also change.
+- Specification: Changes to a document may change the applied specification (particularly in engineering fields) and therefore, how it is built, priced, etc.
+- Quality Control & Safety: Sometimes changes are made to ensure safety and compliance, or to ensure a better quality product.
 
-## Great! How Do I Start?
-Go to https://github.com/AaronMangan/base and click the blue "Use This Repository" button to create your own repo using Base as a template.
+**Example:**
 
-## Configuration
+Let's imagine you are having a cabinet built for your home and you sketch up a design. You then send a copy of the sketch to a cabinet maker and ask for a quote.
+They reply back to you with a price and you agree - Great! You tell them to proceed and are told that it will be completed in about 2 weeks. Two days later, you decide you want to change the height of the cabinet and re-do the sketch, send it off to the cabinet makers and get a new quote back for the latest design.
 
-> Ready to go?
+From the cabinet makers point of view, there are now two sketches of the cabinet - how do they know which one is the correct one to work from? The answer is revisions! The first sketch was revision `A` and the second sketch was revision `B`. 
+The cabinet maker can log into the system and check that `B` is latest version of the sketch and therefore, the correct one, meaning you get the right cabinet made.
 
-1. Find `.env.example` and copy it. Rename it `.env`
-2. Edit it to include your desired credentials in the **Base Users** section, though I have included some defaults if you'd rather use those. **Remember:** These credentials will not be secure, its very important that when using this product in production to ensure you do not create accounts with these credentials.
-3. In your terminal, in the project directory, run `composer install`
-4. Run `npm install` as well.
-5. Optionally, if running Docker, `php artisan sail:install`
-6. Update your database settings in `.env`
-7. Run `php artisan migrate --seed` to migrate and seed the data.
-8. You can then run `npm run dev` and start building.
+This is the fundamental principle of document control, ensuring that changes in documents are communicated effectively to anyone who received it previously.
 
-## Permissions
+Our example was very simple, but imagine a government building, or power plant or even a pipeline being built with thousands of drawings, specifications and schedules. It would be impossible to track what is current without a system like flow.
 
-Currently **Base** provides the following roles already defined for you:
+**So, Why Document Numbers?**
 
-- `super` This is the Super Admin role, it allows anyone with this role to see data for all organisations in your application.
-- `admin` Provides the user with administrator permissions, but only for objects in the admin's organisation.
-- `readonly` Allows users with this role to view but not update or manage items in the platform. They may only view item that belong to their organisation.
+Another feature of document control is that all documents receive a "document number". This performs two critical functions:
 
-## Metadata
+1. Acts as a universal reference to a document, which does not change over time - unlike the title, which may be changed.
+2. Lets the reader know exactly what kind of document it is without having to read through and understand it.
 
-Base includes a pre-defined Status model that can be used and expanded upon. The statuses are:
+Lets look at an example: If a company or entity has a numbering system like:
 
-- `Active` The object is actively in use.
-- `Inactive` The object is not active but should not be deleted.
-- `Deleted` The object has been deleted.
-- `Custom`  A custom status to apply to your object.
+Area - Discipline - Type - Index
 
-## Activity Log
+Then:
 
-Object history is included in base, and allows you to keep track of the changes made to an object.
-By default, this has been enabled in the `User` model but to add it to any other model, simply include the `LogsActivity` trait to the model you want to keep history for.
+`AUS-MEC-REP-000001` - Australian East - West Pipeline - Pumping Station Condition Report - 2025
 
-```php
-use App\Traits\LogsActivity;
+Represents:
 
-// ...
-class MyModel extends Model {
-    use LogsActivity;
+ **AUS** Area, in this case we've used `AUS` for Australia
+
+**MEC** Discipline, where `MEC` is the code for Mechanical
+
+**REP** Because the document is a report, and `REP` is the code for reports
+
+**000001** Is the index, meaning that this is the first document with the AUS-MEC-REP combination of identifiers (metadata). The next document with that combination will be *000002* making each number unique.
+
+If another document for another discipline or type were produced for the same area, it's document number may look like:
+
+`AUS-ELE-DRW-000001` 
+
+and it's title: Australian East - West Pipeline Electrical Supply Diagram - Zone 1 may change with each revision, but its number will not. The next document the sequence may be something like:
+
+`AUS-ELE-DRW-000002 - Australian East - West Pipeline Electrical Supply Diagram - Zone 2`
+
+and so on.
+
+## Installation
+
+Installing Flow is not unlike any other Laravel / React application. Once you have cloned the repo, follow these steps:
+
+`cp .env.example .env` to create an env file. Note that sensitive information such as tokens and API keys should not be committed to any repository.
+
+`composer install` to install the necessary backend packages.
+
+`npm install` to install the necessary frontend packages
+
+`php artisan key:generate` to create the application key.
+
+Now, update the `.env` file with the details of your database, mail provider, etc. Don't forget to add details for admin accounts
+
+Run `php artisan db:seed` to create the Super Admin account.
+
+`npm run build` to build the front end assets.
+
+## Getting Started
+
+Once installed, you may begin setting up Flow. Start by adding metadata in each of the following fields
+
+**Revisions**
+
+Add the revisions that are used by your organisation.
+
+- **Name:** This field allows you to name the revision, to make it easier to understand its use. (e.g. Revision A)
+- **Code:** The code for the revision (e.g. A) - This is typically what is shown one the document.
+- **Description:** You can optionally add some details about the revision here, like why it is used or when it is appropriate to use it.
+
+**Statuses**
+
+Document statuses are generally indicative of their intended use, a common example is Issued For Construction (IFC) and documents with this status will be transmitted to another party, who will use the document to construct (build) something. This is typical of engineering drawings.
+
+- **Name:** The name of the status, to help explain it. (i.e. Issued For Construction)
+- **Code:** Code that is shown on the documents (i.e. IFC)
+- **Draft:** Select yes if this status is only applicable to draft documents, like Issued For Review (IFR). This helps the system know when it is appropriate to transmit a document.
+- **Description:** Details about what the status is used for or when it should be selected, or what documents it applies to.
+
+**Disciplines**
+
+Disciplines are used to group documents together by the department or function they belong to. In an engineering environment this could be Mechanical, Chemical, Electrical, etc.
+
+- **Name:** The discipline name, used to clarify which group the document belongs to.
+- **Code:** Discipline code, which is used when generating document numbers.
+- **Description:** Details of what make a document relevant to this discipline.
+
+**Types**
+
+These are used to further group the documents on a project or scope into the kind of document it is. Some examples include, `Reports`, `Lists`, `Drawings`, `Plans`, etc.
+
+- **Name:** The name for the type of document
+- **Code:** A code representing the type. Typically used in document numbering.
+- **Description:** Information about what makes a document fit this type.
+
+**Areas**
+
+Areas are also used to group documents, typically by geographical area, or by project, etc.
+
+- **Name:** The name for the area (Project, location, etc)
+- **Code:** A code representing the area. Typically used in document numbering.
+- **Description:** Details of what makes a document fit into this area, its location or project.
+
+**Config**
+
+Some options are customizable in Flow. Below is an explanation of which options can be made changed.
+
+`tags` - Set this to `true` of you want the ability to add tags to documents. Tags can be used for a number of different reasons. If any value other than true is set it will be considered as `false` and will not be present.
+
+`areas` - Set to `true` if you want to be able to group documents by area. If any value other than true is set it will be considered as `false` and will not be present.
+
+`types` - Set to true to group documents by types, Report, Drawing, etc. If any value other than true is set it will be considered as `false` and will not be present.
+
+`email_from` - Allows you to set a static email address where all emails generated by the system are set as from. any replies to an email will be sent to this address and it typically recommended to use a group mailbox.
+
+`disciplines` Set to true if you'd like to use disciplines to group your documents by and include them in document numbering.
+
+`document_number_schema` Define what the document number will look like using placeholders. See the relevant section the documentation for more details.
+
+`transmittal_email_limit` Define a limit to the number of documents **SHOWN** on a transmittal email (only). Please note that this is not a hard limit on the number of documents, just a limit to the amount of documents that are displayed in the transmittal email (to help prevent oversize emails) - *When a recipient clicks the **View Transmittal** button, they will be taken to the page where they can see all the documents that are on that transmittal* - Defaults to `50`
+
+`transmittal_expiry_days` Sets a number of days after which the transmittal can no longer be viewed using the link. Defaults to `21 days` (3 weeks)
+
+`document_number_separator` Define what character to use as a separator in the document numbering schema. Defaults to `-`
+
+`document_number_index_format` Describe using a regular expression, what the index portion of the document number should be. in the example below, it is 5 digits (00001, 00002, 00099, etc)
+
+```json
+{
+    "tags": true,
+    "areas": true,
+    "types": true,
+    "email_from": "doccontrol@flow.com.au",
+    "disciplines": true,
+    "document_number_schema": "{area}{separator}{discipline}{separator}{type}{separator}{index}",
+    "transmittal_email_limit": 50,
+    "transmittal_expiry_days": 21,
+    "document_number_separator": "-",
+    "document_number_index_format": "/\\d{5}$/"
 }
-
 ```
-
-## API Usage
-
-While base is primarily a web application template, it does include some API capability. This has been designed to allow to make stateless calls to your backend when needed. A good example is the **Status** metadata, which can be useful to apply to different objects in your application. You can check out the `routes/api.php` file to get a better understanding of how this has been setup and what you can do.
-
-It's a good idea to keep authentication in mind if you do need to add stateless Api calls to your applications to prevent data being accessed by users without authorisation.

@@ -1,14 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
-import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TableView from '@/Components/TableView';
+import FormGen from '@/Components/FormGenerator/FormGen';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
-import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react'
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
@@ -21,15 +17,37 @@ export default function ViewTags({ tags }) {
   const { data, setData, post, processing, reset, errors, clearErrors } = useForm({ name: '', code: '', description: '' });
   const [activeTag, setActiveTag] = useState({ data });
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    }
-  ];
+  const formObj = {
+    id: 'tag_form',
+    title: activeTag && activeTag?.id > 0 ? 'Edit ' + activeTag?.name : 'Add New Tag',
+    titleClass: 'text-gray-600 text-xl',
+    contents: [
+      {
+        id: 'name',
+        type: 'text',
+        label: 'Name',
+        placeholder: 'Please enter a name',
+        className: 'w-full',
+        parentClassName: 'col-span-2 pr-2 w-full',
+      }
+    ],
+    buttons: [
+      {
+        id: 'close_button',
+        label: 'Close',
+        onClick: () => {
+          closeModal();
+        },
+        type: 'danger'
+      },
+      {
+        id: 'save_button',
+        label: 'Save',
+        onClick: (e) => postTag(),
+        type: 'primary'
+      },
+    ],
+  };
 
   /**
    * Update the form data with the data from the form generator
@@ -63,7 +81,7 @@ export default function ViewTags({ tags }) {
    * @param {*} e 
    */
   const postTag = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if(activeTag?.id) {
         post(route('tag.update', {tag: activeTag}), {
             onSuccess: () => {
@@ -143,36 +161,14 @@ export default function ViewTags({ tags }) {
 
       {/* Create a new setting modal */}
       <Modal show={showCreateTag} onClose={closeModal}>
-        <form onSubmit={(e) => {postTag(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          {activeTag && activeTag?.id > 0 ? 'Edit ' + activeTag?.name : 'Add New Tag'}
-          </h2>
-          <FormGenerator
-            className='w-full'
-            config={formObj}
-            valuesCallback={updateFormData}
-            values={activeTag}
-            errors={errors}
-          />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Tag */}
-            <DangerButton className="mr-2" onClick={deleteTag}>
-              Delete Tag
-            </DangerButton>
-
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+        <FormGen
+          config={formObj}
+          className='grid grid-cols-2 gap-1 px-4 py-2 dark:bg-gray-800 dark:text-gray-200'
+          valuesCallback={updateFormData}
+          values={activeTag}
+          errors={errors}
+          reset={reset}
+        />
       </Modal>
     </AuthenticatedLayout>
   );

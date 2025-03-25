@@ -79,7 +79,7 @@
                             @foreach ($transmittal->documents()->limit($details['limit'])->get() as $doc)
                                 <tr>
                                     <td style="padding: 10px; border-bottom: 1px solid #ddd;">{{ $doc['document_number'] }}</td>
-                                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">{{ $doc['revision']['code'] ?? $doc['revision_id'] }} KB</td>
+                                    <td style="padding: 10px; border-bottom: 1px solid #ddd;">{{ $doc['revision']['code'] ?? $doc['revision_id'] }}</td>
                                     <td style="padding: 10px; border-bottom: 1px solid #ddd;">{{ $doc['name'] }}</td>
                                 </tr>
                             @endforeach

@@ -2,8 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
-import SecondaryButton from '@/Components/SecondaryButton';
+import FormGen from '@/Components/FormGenerator/FormGen';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
@@ -92,30 +91,54 @@ export default function ViewTypes({ types }) {
     }
   };
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'code',
-      type: 'text',
-      label: 'Code',
-      placeholder: 'Please enter a code',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'description',
-      type: 'textarea',
-      label: 'Description',
-      placeholder: '[Optional] Description...',
-      className: 'w-full m-2',
-      rows: 5
-    }
-  ];
+  const formObj = {
+    id: 'types_form',
+    title: activeType && activeType?.id > 0 ? 'Edit ' + activeType?.name : 'Add New Type',
+    titleClass: 'text-gray-600 text-xl',
+    contents: [
+      {
+        id: 'name',
+        type: 'text',
+        label: 'Name',
+        placeholder: 'Please enter a name',
+        className: 'w-full',
+        parentClassName: 'col-span-2 pr-2 w-full',
+      },
+      {
+        id: 'code',
+        type: 'text',
+        label: 'Code',
+        placeholder: 'Please enter a code',
+        className: 'w-full',
+        parentClassName: 'col-span-2 pr-2 w-full',
+      },
+      {
+        id: 'description',
+        type: 'textarea',
+        label: 'Description',
+        placeholder: '[Optional] Description...',
+        className: 'w-full',
+        parentClassName: 'col-span-2 pr-2 w-full',
+        rows: 5
+      }
+    ],
+    buttons: [
+      {
+        id: 'close_button',
+        label: 'Close',
+        onClick: () => {
+          setShowCreateType(false);
+        },
+        type: 'danger'
+      },
+      {
+        id: 'save_button',
+        label: 'Save',
+        onClick: (e) => postType(e),
+        type: 'primary'
+      },
+    ]
+  };
 
   /**
    * Update the form data with the data from the form generator
@@ -150,24 +173,23 @@ export default function ViewTypes({ types }) {
    * @param {*} e 
    */
   const postType = (e) => {
-    e.preventDefault();
     if(activeType?.id) {
         post(route('type.update', {type: activeType}), {
             onSuccess: () => {
-                toast.success('Type updated successfully');
-                setShowCreateType(false);
-                setActiveType(null);
-                refreshData();
+              toast.success('Type updated successfully');
+              setShowCreateType(false);
+              setActiveType({ name: '', code: '', description: '' });
+              refreshData();
             },
             onError: () => {
-                toast.error('An error occurred, please contact your administrator');
+              toast.error('An error occurred, please contact your administrator');
             },
         });
     } else {
       post(route('type.create'), {
         onSuccess: () => {
           toast.success('Type created successfully!');
-          setActiveType(null);
+          setActiveType({ name: '', code: '', description: '' })
           setShowCreateType(false);
           refreshData();
         },
@@ -211,37 +233,23 @@ export default function ViewTypes({ types }) {
 
         {/* Lets users add a new setting */}
         <FloatingButton className="bg-gray-800" onClick={
-            () => {setShowCreateType(true)}
+            () => {
+              setActiveType({});
+              setShowCreateType(true);
+            }
         }/>
       </>
 
       {/* Create a new setting modal */}
       <Modal show={showCreateType} onClose={closeModal}>
-        <form onSubmit={(e) => {postType(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {activeType && activeType?.id > 0 ? 'Edit ' + activeType?.name : 'Add New Type'}
-          </h2>
-          <FormGenerator
-            className='w-full'
-            config={formObj}
-            valuesCallback={updateFormData}
-            values={activeType}
-            errors={errors}
-          />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+        <FormGen
+          config={formObj}
+          className='grid grid-cols-2 gap-1 px-4 py-2 dark:bg-gray-800 dark:text-gray-200'
+          valuesCallback={updateFormData}
+          values={activeType}
+          errors={errors}
+          reset={reset}
+        />
       </Modal>
     </AuthenticatedLayout>
   );

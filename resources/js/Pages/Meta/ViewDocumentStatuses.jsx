@@ -2,8 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
-import FormGenerator from '@/Components/FormGenerator';
-import SecondaryButton from '@/Components/SecondaryButton';
+import FormGen from '@/Components/FormGenerator/FormGen';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
 import Modal from '@/Components/Modal';
@@ -12,6 +11,7 @@ import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import Tooltip from '@/Components/Tooltip';
+import { truncateText } from '@/Utils/helpers';
 
 export default function ViewDocumentStatuses({ statuses }) {
   const [showCreateStatus, setShowCreateStatus] = useState(false);
@@ -33,7 +33,7 @@ export default function ViewDocumentStatuses({ statuses }) {
     {
       name: 'Name',
       selector: row => row.name ?? null,
-      width: '10pc'
+      width: '15pc'
     },
     {
       name: 'Code',
@@ -48,7 +48,7 @@ export default function ViewDocumentStatuses({ statuses }) {
     },
     {
       name: 'Description',
-      selector: row => row.description,
+      selector: row => truncateText(row.description, 100),
       width: 'full',
     },
     {
@@ -82,7 +82,7 @@ export default function ViewDocumentStatuses({ statuses }) {
               </>
           );
       },
-      width: '20pc'
+      width: '15pc'
     }
   ];
 
@@ -100,37 +100,65 @@ export default function ViewDocumentStatuses({ statuses }) {
     }
   };
 
-  const formObj = [
-    {
-      id: 'name',
-      type: 'text',
-      label: 'Name',
-      placeholder: 'Please enter a name',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'code',
-      type: 'text',
-      label: 'Code',
-      placeholder: 'Please enter a code',
-      className: 'w-full m-2'
-    },
-    {
-      id: 'description',
-      type: 'textarea',
-      label: 'Description',
-      placeholder: '[Optional] Description...',
-      className: 'w-full m-2',
-      rows: 5
-    },
-    {
-      id: 'draft',
-      type: 'checkbox',
-      label: 'Draft Status',
-      className: 'w-1/2 mx-2 rounded',
-      placeholder: null
-    }
-  ];
+  /**
+   * Controls what form is displayed to the user.
+   */
+  const formObj = {
+    id: 'Status Form',
+    title: activeStatus && activeStatus?.id > 0 ? 'Edit ' + activeStatus?.name : 'Add New Status',
+    titleClass: 'text-gray-600 text-xl',
+    contents: [
+      {
+        id: 'name',
+        type: 'text',
+        label: 'Name',
+        placeholder: 'Please enter a name',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+      },
+      {
+        id: 'code',
+        type: 'text',
+        label: 'Code',
+        placeholder: 'Please enter a code',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+      },
+      {
+        id: 'description',
+        type: 'textarea',
+        label: 'Description',
+        placeholder: '[Optional] Description...',
+        className: 'w-full',
+        parentClassName: 'col-span-2 w-full',
+        rows: 5
+      },
+      {
+        id: 'draft',
+        type: 'switch',
+        label: 'Draft Status',
+        className: 'pl-2',
+        placeholder: null,
+        parentClassName: 'col-span-1 pt-2',
+      }
+    ],
+    buttons: [
+      {
+        id: 'close_button',
+        label: 'Close',
+        onClick: () => {
+          setShowCreateStatus(false);
+        },
+        type: 'danger'
+      },
+      {
+        id: 'save_button',
+        label: 'Save',
+        onClick: (e) => postStatus(e),
+        type: 'primary'
+      },
+    ]
+  };
 
   /**
    * Update the form data with the data from the form generator
@@ -156,7 +184,7 @@ export default function ViewDocumentStatuses({ statuses }) {
    */
   const closeModal = () => {
     setShowCreateStatus(false);
-    setActiveStatus(null);
+    setActiveStatus({});
     setActiveStatus({ name: '', code: '', description: '', draft: false });
   }
 
@@ -171,7 +199,7 @@ export default function ViewDocumentStatuses({ statuses }) {
           onSuccess: () => {
             toast.success('Document Status updated successfully');
             setShowCreateStatus(false);
-            setActiveStatus(null);
+            setActiveStatus({});
             refreshData();
           },
           onError: () => {
@@ -182,7 +210,7 @@ export default function ViewDocumentStatuses({ statuses }) {
       post(route('status.create'), {
         onSuccess: () => {
           toast.success('Document Status created successfully!');
-          setActiveStatus(null);
+          setActiveStatus({ name: '', code: '', description: '', draft: false });
           setShowCreateStatus(false);
           refreshData();
         },
@@ -234,34 +262,15 @@ export default function ViewDocumentStatuses({ statuses }) {
             () => {setShowCreateStatus(true)}
         }/>
       </>
-
-      {/* Create a new setting modal */}
       <Modal show={showCreateStatus} onClose={closeModal}>
-        <form onSubmit={(e) => {postStatus(e)}} className="p-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {activeStatus && activeStatus?.id > 0 ? 'Edit ' + activeStatus?.name : 'Add New Status'}
-          </h2>
-          <FormGenerator
-            className='w-full'
-            config={formObj}
-            valuesCallback={updateFormData}
-            values={activeStatus}
-            errors={errors}
-          />
-
-          {/* Buttons to handle saving or cancelling */}
-          <div className="flex justify-end mt-6">
-            {/* Save the changes to the user */}
-            <PrimaryButton className="mr-2" disabled={processing}>
-              Save
-            </PrimaryButton>
-            
-            {/* Cancel */}
-            <SecondaryButton onClick={closeModal}>
-              Cancel
-            </SecondaryButton>
-          </div>
-        </form>
+        <FormGen
+          config={formObj}
+          className='grid grid-cols-2 gap-1 px-4 py-2 mb-2 dark:bg-gray-800 dark:text-gray-200'
+          valuesCallback={updateFormData}
+          values={activeStatus}
+          errors={errors}
+          reset={reset}
+        />
       </Modal>
     </AuthenticatedLayout>
   );

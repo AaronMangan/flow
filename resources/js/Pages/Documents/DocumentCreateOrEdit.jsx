@@ -3,7 +3,6 @@ import { Head, useForm } from '@inertiajs/react';
 import { useRef, useState, useEffect } from 'react';
 import FormGen from '@/Components/FormGenerator/FormGen';
 import axios from 'axios';
-import PrimaryButton from '@/Components/PrimaryButton';
 import { toast } from 'react-toastify';
 
 export default function DocumentCreateOrEdit ({ document, messages }) {
@@ -205,7 +204,7 @@ export default function DocumentCreateOrEdit ({ document, messages }) {
         },
         {
           id: 'is_placeholder',
-          type: 'checkbox',
+          type: 'switch',
           label: 'Placeholder',
           className: 'w-[200px]',
           placeholder: null
@@ -284,7 +283,7 @@ export default function DocumentCreateOrEdit ({ document, messages }) {
                 <div className="px-6 text-gray-900 dark:text-gray-200">
                   <FormGen
                     config={formObj}
-                    className='grid grid-cols-2 gap-4 dark:bg-gray-800 dark:text-gray-200'
+                    className='grid grid-cols-2 gap-4 pb-4 dark:bg-gray-800 dark:text-gray-200'
                     valuesCallback={updateFormData}
                     values={data}
                     errors={errors}
