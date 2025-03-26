@@ -6,7 +6,9 @@
 
 ### *Why are documents "controlled"?*
 
-At it's most basic level, documents are controlled when it is important to know that you have the latest version (revision). This becomes particularly relevant in an engineering environment because when an entity is building something, either physically or in design, it is common for changes to take place (for a myriad of reasons). When a change is made the recipients of the original document need to be made aware of the new revision so that they can action it accordingly.
+At it's most basic level, documents are controlled when it is important to know that you have the latest version (revision). This becomes particularly relevant in an engineering environment because when an entity is building something, either physically or in design, it is common for changes to take place (for a myriad of reasons).
+
+When a change is made the recipients of the original document need to be made aware of the new revision so that they can action it accordingly.
 
 Changes in documents can also have other effects:
 
@@ -18,6 +20,7 @@ Changes in documents can also have other effects:
 **Example:**
 
 Let's imagine you are having a cabinet built for your home and you sketch up a design. You then send a copy of the sketch to a cabinet maker and ask for a quote.
+
 They reply back to you with a price and you agree - Great! You tell them to proceed and are told that it will be completed in about 2 weeks. Two days later, you decide you want to change the height of the cabinet and re-do the sketch, send it off to the cabinet makers and get a new quote back for the latest design.
 
 From the cabinet makers point of view, there are now two sketches of the cabinet - how do they know which one is the correct one to work from? The answer is revisions! The first sketch was revision `A` and the second sketch was revision `B`. 
@@ -94,12 +97,14 @@ Add the revisions that are used by your organisation.
 
 **Statuses**
 
-Document statuses are generally indicative of their intended use, a common example is Issued For Construction (IFC) and documents with this status will be transmitted to another party, who will use the document to construct (build) something. This is typical of engineering drawings.
+Document statuses are generally indicative of their intended use, a common example is Issued For Construction (IFC) and documents with this status will be transmitted to another party, who will use the document to construct (build) something. This is typical of engineering drawings, but useful for any document to inform the reader about the current state of the document.
 
 - **Name:** The name of the status, to help explain it. (i.e. Issued For Construction)
 - **Code:** Code that is shown on the documents (i.e. IFC)
 - **Draft:** Select yes if this status is only applicable to draft documents, like Issued For Review (IFR). This helps the system know when it is appropriate to transmit a document.
 - **Description:** Details about what the status is used for or when it should be selected, or what documents it applies to.
+
+You are not limited to engineering or construction statuses for your documentation - in fact you can make whatever statuses you like and apply them to the document.
 
 **Disciplines**
 
@@ -163,3 +168,33 @@ Some options are customizable in Flow. Below is an explanation of which options 
     "document_number_index_format": "/\\d{5}$/"
 }
 ```
+
+## Document Numbering
+
+Every organisation or team handles document number differently, but the principle is the same. Each document should be assigned a unique identifier that allows for quick identification of a document.
+
+This works because trying to identify a document by its title or other properties is not always accurate, as these may change over time. It also tells the reader some information about the document without needing to read and/or understand it.
+
+There are many examples of document numbering , but, in general the document metadata is used to put together a unique identifier. In **Flow** you can specify how you want the document number to be made by defining it in the config for the organisation.
+
+### Metadata Placeholders
+
+Metadata placeholders are used to determine how a document number should be made. A placeholder is a `key` wrapped in braces `{}`. For example `{area}`. There are also several special placeholders such as `{separator}` - which is used to separate the elements of the document number.
+
+If your organisation uses a `-` separator, and your document numbering scheme is defined as `{area}{separator}{discipline}{separator}{type}{separator}{index}` and you have:
+
+An `area` of **SGF** for Southern Gas Field
+A `discipline` of **MEC** for Mechanical
+A type of **REP** for Report
+The `index` will be computed by flow at the time the document number is created. For example, lets use `00099`
+The separator is defined as a `-`
+
+Then, the resulting document number would be `SGF-MEC-REP-00099`
+
+## Grouping
+Keep in mind that the metadata can be used in whichever way suits you, your team or organisation. Disciplines aren't limited to engineering disciplines but can be any groupings you can think of. This is the same for Areas and Types as well. Think of them as three different ways in which you may group and sort documents.
+
+
+## Tags
+
+Another feature of Flow is tagging. Tagging helps you categorize documents by applying labels. These can make searching for, and finding, relevant documentation a lot easier. You are free to define and apply tags in whatever manner you believe will benefit you or your team.
