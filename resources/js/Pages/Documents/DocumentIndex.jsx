@@ -4,21 +4,27 @@ import { useRef, useState, useEffect } from 'react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TableView from '@/Components/TableView';
 import FloatingButton from '@/Components/FloatingButton';
-// import Modal from '@/Components/Modal';
+import Modal from '@/Components/Modal';
 import { toast } from 'react-toastify';
 import DangerButton from '@/Components/DangerButton';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import FilterBar from '@/Components/FilterBar';
+import { removeKeys } from '@/Utils/helpers';
 import { ExclamationCircleIcon, DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import dayjs from 'dayjs';
+import DescriptionList from '@/Components/DescriptionList';
 
-export default function ViewDocuments({ documents, messages }) {
+export default function ViewDocuments({ documents, messages, metadata }) {
   let debounceTimer;
   const [showDocumentDetails, setShowDocumentDetails] = useState(false);
   
   const [activeDocument, setActiveDocument] = useState({});
   const [filters, setFilters] = useState([]);
 
+  const closeModal = () => {
+    setShowDocumentDetails(false);
+  }
   /**
    * Document Table Columns
    */
@@ -84,7 +90,7 @@ export default function ViewDocuments({ documents, messages }) {
       width: '25pc'
     }
   ];
-
+  
   /**
    * Custom Styles for the table headers
    */
@@ -98,15 +104,6 @@ export default function ViewDocuments({ documents, messages }) {
       }
     }
   };
-
-  /**
-   * Close Modal
-   */
-  const closeModal = () => {
-    setActiveDocument(null);
-    setActiveDocument({ name: '', code: '', description: '' })
-    setShowDocumentDetails(false);
-  }
 
   /**
    * Reloads the data without reloading the page.
@@ -219,6 +216,83 @@ export default function ViewDocuments({ documents, messages }) {
             router.visit(route('documents.create'))
           }
         }/>
+
+        <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
+          {/* <div className='px-4 py-4 overflow-y-auto'> */}
+          <div className='relative max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg'>
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-4">
+              <div>
+                <dt className="font-bold text-gray-900">Document Number</dt>
+                <dd className="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-gray-900">Title</dt>
+                <dd className="text-gray-600">{activeDocument.name}</dd>
+              </div>
+
+              <dl className="grid grid-cols-2 text-sm gap-x-6 gap-y-4">
+                <div>
+                  <dt className="font-bold text-gray-900">Area</dt>
+                  <dd className="text-gray-600">{activeDocument?.area?.name}</dd>
+                </div>
+                
+                <div>
+                  <dt className="font-bold text-gray-900">Discipline</dt>
+                  <dd className="text-gray-600">{activeDocument.discipline?.name}</dd>
+                </div>
+              
+                <div>
+                  <dt className="font-bold text-gray-900">Type</dt>
+                  <dd className="text-gray-600">{activeDocument?.type?.name}</dd>
+                </div>
+              
+                <div>
+                  <dt className="font-bold text-gray-900">Status</dt>
+                  <dd className="text-gray-600">{activeDocument?.document_status?.name}</dd>
+                </div>
+              </dl>
+              {activeDocument?.latest_activity && (
+                <div className='py-2 text-white bg-gray-500 border border-gray-200 rounded-lg dark:bg-gray-200 dark:text-white'>
+                  <h2 className='font-bold text-center'>Previous History</h2>
+                </div>
+              )}
+              {activeDocument?.latest_activity && (
+                <>
+                  <dl className="grid grid-cols-2 text-sm gap-x-6 gap-y-4">
+                    <div>
+                      <dt className="font-bold text-gray-700">By</dt>
+                      <dd className="text-gray-600">{activeDocument?.latest_activity?.user?.name || ''}</dd>
+                    </div>
+                    
+                    <div>
+                      <dt className="font-bold text-gray-700">When</dt>
+                      <dd className="text-gray-600">{dayjs(activeDocument?.latest_activity?.created_at).format('DD/MM/YYYY HH:MM A') || ''}</dd>
+                    </div>
+                  
+                    <div>
+                      <dt className="font-bold text-gray-700">What</dt>
+                      <dd className="text-gray-600">{activeDocument?.latest_activity?.model_name.replace('App\\Models\\', '') || ''}</dd>
+                    </div>
+                  
+                    <div>
+                      <dt className="font-bold text-gray-700">Event</dt>
+                      <dd className="text-gray-600 capitalize">{activeDocument?.latest_activity?.event || ''}</dd>
+                    </div>
+                  </dl>
+                  <div className='text-gray-600 font-italic'>
+                    <DescriptionList metadata={metadata} data={removeKeys(activeDocument?.latest_activity?.data, ['updated_at', 'updated_by', 'created_at'])} />
+                  </div>
+                </>
+              )}
+              <div className='text-right'>
+                <PrimaryButton className="" onClick={closeModal}>
+                  <XMarkIcon className="w-3 h-3 mr-2"/>
+                  Close
+                </PrimaryButton>
+              </div>
+            </dl>
+          </div>
+        </Modal>
       </>
     </AuthenticatedLayout>
   );

@@ -10,10 +10,6 @@ dayjs.extend(relativeTime);
 
 export default function Dashboard({ auth, data }) {
   const [pageData, setPageData] = useState(data);
-
-  // useEffect(() => {
-
-  // }, [data]);
   return (
     <AuthenticatedLayout>
       <Head title={'View History'} />

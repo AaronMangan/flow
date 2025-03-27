@@ -20,4 +20,18 @@ class ActivityLog extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    protected $casts = [
+        'data' => 'array'
+    ];
+
+    /**
+     * MorphTo Relationship.
+     *
+     * @return void
+     */
+    public function model()
+    {
+        return $this->belongsTo($this->model_name, 'model_id');
+    }
 }

@@ -26,6 +26,8 @@ class DocumentController extends Controller
         // Return
         return Inertia::render('Documents/DocumentIndex', [
             'documents' => $this->getDocuments($request->all()),
+            'messages' => [],
+            'metadata' => $this->getMetadata(),
         ]);
     }
 
@@ -81,8 +83,9 @@ class DocumentController extends Controller
 
         // If the document was saved, then render the index.
         return Inertia::render('Documents/DocumentIndex', [
-            'documents' => $this->getDocuments(),
-            'messages' => $messages
+            'documents' => $this->getDocuments([]),
+            'messages' => $messages,
+            'metadata' => $this->getMetadata(),
         ]);
 
     }
@@ -106,7 +109,9 @@ class DocumentController extends Controller
 
         //
         return Inertia::render('Documents/DocumentCreateOrEdit', [
-            'document' => $document->toArray()
+            'document' => $document->toArray(),
+            'messages' => [],
+            'metadata' => $this->getMetadata(),
         ]);
     }
 
@@ -146,7 +151,8 @@ class DocumentController extends Controller
 
         return Inertia::render('Documents/DocumentCreateOrEdit', [
             'document' => $document->toArray(),
-            'messages' => $messages
+            'messages' => $messages,
+            'metadata' => $this->getMetadata(),
         ]);
     }
 
@@ -163,7 +169,7 @@ class DocumentController extends Controller
      *
      * @return array
      */
-    private function getDocuments(array $params): array
+    private function getDocuments(array $params = []): array
     {
         $query = Document::query();
 
@@ -173,10 +179,44 @@ class DocumentController extends Controller
                     return $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
                 });
             }
-            return $query->get()->load('discipline', 'area', 'type', 'document_status', 'revision')->toArray();
+            return $query->get()->load('discipline', 'area', 'type', 'document_status', 'revision', 'latestActivity', 'latestActivity.user')->toArray();
         }
 
         return $query->where('organisation_id', \Auth::user()->organisation_id)
-            ->get()->load('discipline', 'area', 'type', 'document_status', 'revision')->toArray() ?? [];
+            ->get()->load('discipline', 'area', 'type', 'document_status', 'revision', 'latestActivity', 'latestActivity.user')->toArray() ?? [];
+    }
+
+    /**
+     * Returns the basic metadata for the application.
+     *
+     * @return array|null
+     */
+    private function getMetadata(): ?array
+    {
+        if (\Auth::user()->hasRole('super')) {
+            return [
+                'areas' => \App\Models\Area::get(['id', 'organisation_id', 'name']) ?? [],
+                'disciplines' => \App\Models\Discipline::get(['id', 'organisation_id', 'name']) ?? [],
+                'types' => \App\Models\Type::get(['id', 'organisation_id', 'name']) ?? [],
+                'document_statuses' => \App\Models\DocumentStatus::get(['id', 'organisation_id', 'name']) ?? [],
+                'revisions' => \App\Models\Revision::orderBy('weight', 'asc')->get(['id', 'organisation_id', 'name']) ?? [],
+            ];
+        }
+
+        $org_id = \Auth::user()->organisation_id ?? false;
+        if (!$org_id) {
+            return [];
+        }
+
+        /**
+         * Return metadata.
+         */
+        return [
+            'areas' => \App\Models\Area::where('organisation_id', $org_id)->get(['id', 'organisation_id', 'name']) ?? [],
+            'disciplines' => \App\Models\Discipline::where('organisation_id', $org_id)->get(['id', 'organisation_id', 'name']) ?? [],
+            'types' => \App\Models\Type::where('organisation_id', $org_id)->get(['id', 'organisation_id', 'name']) ?? [],
+            'document_statuses' => \App\Models\DocumentStatus::where('organisation_id', $org_id)->get(['id', 'organisation_id', 'name']) ?? [],
+            'revisions' => \App\Models\Revision::where('organisation_id', $org_id)->orderBy('weight', 'asc')->get(['id', 'organisation_id', 'name']) ?? [],
+        ];
     }
 }

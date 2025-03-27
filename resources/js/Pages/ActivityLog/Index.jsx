@@ -7,6 +7,7 @@ import { Inertia } from '@inertiajs/inertia';
 import FilterBar from '@/Components/FilterBar';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { router } from '@inertiajs/react'
+import { truncateText, removeKeys } from '@/Utils/helpers';
 
 export default function Dashboard({ history, filters }) {
   const { data, current_page, last_page } = history;
@@ -46,8 +47,9 @@ export default function Dashboard({ history, filters }) {
       id: 'data',
       name: 'Changes',
       cell: (row) => {
+        const displayData = row?.data ? truncateText(JSON.stringify(removeKeys(row?.data, ['updated_at', 'created_at'])), 200) : 'No Previous Data'
         return (
-          <Link href={route('activity-log.show', {activity_log: row})} method="get">{row?.data?.length > 250 ? row?.data?.slice(0, 250) + '...' : row?.data || 'created'}</Link>
+          <Link href={route('activity-log.show', {activity_log: row?.id})} method="get">{displayData}</Link>
         );
       },
       width: '40pc'

@@ -22,3 +22,16 @@ export const debounce = (func, delay = 300) => {
         timeout = setTimeout(() => func(...args), delay);
     };
 };
+
+
+/**
+ * Removes key from object, typically for display. Used primarily for activity log because the updated at and by keys are not required to be displayed.
+ * @param {any} object
+ * @param {any} keys
+ * @returns {any}
+ */
+export const removeKeys = (obj, keysToRemove) => {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([key]) => !keysToRemove.includes(key))
+    );
+}
