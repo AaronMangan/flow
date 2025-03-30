@@ -14,6 +14,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Traits\LogsActivity;
 use App\Flow\Flow;
 
+// use App\Models\Scopes\OrganisationScope;
+// use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+
+// #[ScopedBy([OrganisationScope::class])]
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\LogsActivity;
 use Illuminate\Support\Arr;
 
+// use App\Models\Scopes\OrganisationScope;
+// use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+
+// #[ScopedBy([OrganisationScope::class])]
 class Config extends Model
 {
     use LogsActivity;

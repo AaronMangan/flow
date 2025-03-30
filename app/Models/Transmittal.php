@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\DocumentStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Scopes\OrganisationScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([OrganisationScope::class])]
 class Transmittal extends Model
 {
     //

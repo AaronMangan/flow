@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Scopes\OrganisationScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([OrganisationScope::class])]
 class ActivityLog extends Model
 {
     protected $fillable = [

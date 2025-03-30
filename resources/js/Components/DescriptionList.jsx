@@ -56,7 +56,7 @@ const DescriptionList = ({ data, metadata }) => {
   }, [])
 
   return (
-    <dl className="grid grid-cols-1 text-sm sm:grid-cols-2 gap-x-6 gap-y-4">
+    <dl className="grid grid-cols-1 pb-4 text-sm sm:grid-cols-2 gap-x-6 gap-y-4">
       {Object.entries(mapped).map(([key, value]) => (
          <div key={key}>
           <dt className="font-bold text-gray-900 capitalize">{key.replace('_id', '').replace('_', ' ')}</dt>

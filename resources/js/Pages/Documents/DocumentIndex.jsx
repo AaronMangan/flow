@@ -18,7 +18,7 @@ import DescriptionList from '@/Components/DescriptionList';
 export default function ViewDocuments({ documents, messages, metadata }) {
   let debounceTimer;
   const [showDocumentDetails, setShowDocumentDetails] = useState(false);
-  
+  const [isOpen, setIsOpen] = useState(false);
   const [activeDocument, setActiveDocument] = useState({});
   const [filters, setFilters] = useState([]);
 
@@ -219,11 +219,19 @@ export default function ViewDocuments({ documents, messages, metadata }) {
 
         <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
           {/* <div className='px-4 py-4 overflow-y-auto'> */}
-          <div className='relative max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg'>
+          <div className={!activeDocument?.latest_activity ? 'relative mb-0 pb-4  max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg' : 'relative mb-0 pb-0  max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg'}>
             <dl className="grid grid-cols-1 gap-x-8 gap-y-4">
-              <div>
-                <dt className="font-bold text-gray-900">Document Number</dt>
-                <dd className="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
+              <div className='flex justify-between flex-inline'>
+                <div className="">
+                  <dt className="font-bold text-gray-900">Document Number</dt>
+                  <dd className="text-gray-600">{activeDocument?.document_number || 'N/A'}</dd>
+                </div>
+                <div className=''>
+                  <PrimaryButton className="" onClick={closeModal}>
+                    <XMarkIcon className="w-3 h-3 mr-2"/>
+                    Close
+                  </PrimaryButton>
+                </div>
               </div>
               <div>
                 <dt className="font-bold text-gray-900">Title</dt>
@@ -252,13 +260,13 @@ export default function ViewDocuments({ documents, messages, metadata }) {
                 </div>
               </dl>
               {activeDocument?.latest_activity && (
-                <div className='py-2 text-white bg-gray-500 border border-gray-200 rounded-lg dark:bg-gray-200 dark:text-white'>
-                  <h2 className='font-bold text-center'>Previous History</h2>
+                <div onClick={() => setIsOpen(!isOpen)} className='py-2 text-white bg-gray-700 border border-gray-200 rounded-lg dark:bg-gray-200 dark:text-white'>
+                  <h2 className='font-bold text-center'>{!isOpen ? 'Show Previous History' : 'Hide Previous History'}</h2>
                 </div>
               )}
               {activeDocument?.latest_activity && (
-                <>
-                  <dl className="grid grid-cols-2 text-sm gap-x-6 gap-y-4">
+                <div className={`transition-all duration-300 ${isOpen ? "max-h-96 opacity-100 pb-4" : "overflow-hidden pb-0 max-h-0 opacity-0"}`}>
+                  <dl className="grid grid-cols-2 py-2 text-sm gap-x-6 gap-y-4">
                     <div>
                       <dt className="font-bold text-gray-700">By</dt>
                       <dd className="text-gray-600">{activeDocument?.latest_activity?.user?.name || ''}</dd>
@@ -282,14 +290,8 @@ export default function ViewDocuments({ documents, messages, metadata }) {
                   <div className='text-gray-600 font-italic'>
                     <DescriptionList metadata={metadata} data={removeKeys(activeDocument?.latest_activity?.data, ['updated_at', 'updated_by', 'created_at'])} />
                   </div>
-                </>
+                </div>
               )}
-              <div className='text-right'>
-                <PrimaryButton className="" onClick={closeModal}>
-                  <XMarkIcon className="w-3 h-3 mr-2"/>
-                  Close
-                </PrimaryButton>
-              </div>
             </dl>
           </div>
         </Modal>

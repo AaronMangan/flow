@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Http\Requests\Documents\CreateNewDocumentRequest;
 use App\Http\Requests\Documents\UpdateDocumentRequest;
 use App\Traits\GeneratesDocumentNumbers;
+use App\Models\Scopes\OrganisationScope;
 
 class DocumentController extends Controller
 {
@@ -174,6 +175,8 @@ class DocumentController extends Controller
         $query = Document::query();
 
         if (\Auth::user()->hasRole('super')) {
+            // Remove the global scope for super admins.
+            $query->withoutGlobalScope(OrganisationScope::class);
             if (isset($params['search'])) {
                 $query->where(function ($subquery) use ($params) {
                     return $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
@@ -195,11 +198,11 @@ class DocumentController extends Controller
     {
         if (\Auth::user()->hasRole('super')) {
             return [
-                'areas' => \App\Models\Area::get(['id', 'organisation_id', 'name']) ?? [],
-                'disciplines' => \App\Models\Discipline::get(['id', 'organisation_id', 'name']) ?? [],
-                'types' => \App\Models\Type::get(['id', 'organisation_id', 'name']) ?? [],
-                'document_statuses' => \App\Models\DocumentStatus::get(['id', 'organisation_id', 'name']) ?? [],
-                'revisions' => \App\Models\Revision::orderBy('weight', 'asc')->get(['id', 'organisation_id', 'name']) ?? [],
+                'areas' => \App\Models\Area::withoutGlobalScope(OrganisationScope::class)->get(['id', 'organisation_id', 'name']) ?? [],
+                'disciplines' => \App\Models\Discipline::withoutGlobalScope(OrganisationScope::class)->get(['id', 'organisation_id', 'name']) ?? [],
+                'types' => \App\Models\Type::withoutGlobalScope(OrganisationScope::class)->get(['id', 'organisation_id', 'name']) ?? [],
+                'document_statuses' => \App\Models\DocumentStatus::withoutGlobalScope(OrganisationScope::class)->get(['id', 'organisation_id', 'name']) ?? [],
+                'revisions' => \App\Models\Revision::withoutGlobalScope(OrganisationScope::class)->orderBy('weight', 'asc')->get(['id', 'organisation_id', 'name']) ?? [],
             ];
         }
 

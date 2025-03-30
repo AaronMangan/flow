@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Area;
 use App\Models\Discipline;
 use App\Traits\LogsActivity;
+use App\Models\Scopes\OrganisationScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([OrganisationScope::class])]
 class Document extends Model
 {
     use LogsActivity;
