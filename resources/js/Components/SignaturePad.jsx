@@ -2,12 +2,12 @@ import React, { useRef, useState, useEffect } from "react";
 import PrimaryButton from "./PrimaryButton";
 import DangerButton from "./DangerButton";
 
-const SignaturePad = ({ blurb, saveCallback }) => {
+const SignaturePad = ({ blurb, signatureCallback, onSave, value }) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
   const [width, setWidth] = useState(300);
-  const [signatureData, setSignatureData] = useState(null);
+  const [signatureData, setSignatureData] = useState(value || null);
 
   useEffect(() => {
     const updateWidth = () => {
@@ -26,7 +26,11 @@ const SignaturePad = ({ blurb, saveCallback }) => {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
-  }, [width]);
+    
+    if (value !== null) {
+      loadSignature(value);
+    }
+  }, [width, value]);
 
   const startDrawing = (e) => {
     const { offsetX, offsetY } = e.nativeEvent;
@@ -35,6 +39,19 @@ const SignaturePad = ({ blurb, saveCallback }) => {
     ctx.moveTo(offsetX, offsetY);
     setIsDrawing(true);
     setIsEmpty(false);
+  };
+
+  const loadSignature = (signature) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = signature;
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      setIsEmpty(false);
+    };
+    setSignatureData(signature);
   };
 
   const draw = (e) => {
@@ -47,6 +64,7 @@ const SignaturePad = ({ blurb, saveCallback }) => {
 
   const stopDrawing = () => {
     setIsDrawing(false);
+    saveSignature()
   };
 
   const clearSignature = () => {
@@ -57,12 +75,13 @@ const SignaturePad = ({ blurb, saveCallback }) => {
   };
 
   const saveSignature = () => {
-    const canvas = canvasRef.current;
-    const dataUrl = canvas.toDataURL("image/png");
-    setSignatureData(dataUrl);
-    console.log(signatureData);
+    if(!isEmpty) {
+      const canvas = canvasRef.current;
+      const dataUrl = canvas.toDataURL("image/png");
+      setSignatureData(dataUrl);
+      signatureCallback(signatureData);
+    }
   };
-
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -87,7 +106,7 @@ const SignaturePad = ({ blurb, saveCallback }) => {
         <div>
             <PrimaryButton
                 className="px-4 py-2 mt-2"
-                onClick={saveSignature}
+                onClick={(e) => onSave(signatureData)}
             >Save</PrimaryButton>
         </div>
         {blurb && typeof blurb !== 'undefined' && (
@@ -97,10 +116,10 @@ const SignaturePad = ({ blurb, saveCallback }) => {
         )}
         <div>
             <DangerButton
-                onClick={clearSignature}
-                className="px-4 py-2 mt-2"
+              onClick={clearSignature}
+              className="px-4 py-2 mt-2"
             >
-                Clear
+              Clear
             </DangerButton>
         </div>
       </div>

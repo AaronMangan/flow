@@ -4,8 +4,38 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import SignaturePad from '@/Components/SignaturePad';
+import axios from 'axios';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { router } from '@inertiajs/react';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({ mustVerifyEmail, status, userSignature }) {
+    const [signature, setSignature] = useState(userSignature || null);
+    /**
+     * Sends the signature to the server.
+     * @param {*} data 
+     */
+    const saveCallback = (data) => {
+        axios.post(route('api.save-signature'), {signature: signature || data}).then(response => {
+            if (response?.data && response?.data?.status && response?.data?.status === 'success') {
+                toast.success(response?.data?.message || 'Success');
+            } else {
+                toast.error(response?.data?.message || 'An error occurred, please try again or contact your administrator');
+            }
+        }).catch(ex => {
+            console.error(ex.message);
+        })
+
+    }
+
+    /**
+     * Callback to set the data for the signature.
+     * @param {*} data 
+     */
+    const signatureCallback = (data) => {
+        setSignature(data);
+    }
+
     return (
         <AuthenticatedLayout
             header={
@@ -36,7 +66,12 @@ export default function Edit({ mustVerifyEmail, status }) {
 
                     {/* Signature Collection */}
                     <div className="bg-white shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <SignaturePad blurb="Add your signature here which is added to transmittals and correspondence" />
+                        <SignaturePad
+                            signatureCallback={signatureCallback}
+                            onSave={(e) => saveCallback(signature)}
+                            blurb="Add your signature here which is added to transmittals and correspondence"
+                            value={signature}
+                        />
                     </div>
                 </div>
             </div>

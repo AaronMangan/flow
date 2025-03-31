@@ -38,7 +38,8 @@ class User extends Authenticatable
         'email',
         'password',
         'organisation_id',
-        'status_id'
+        'status_id',
+        'signature',
     ];
 
     /**
@@ -56,8 +57,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'signature'
     ];
 
+    /**
+     * Appends these attributes.
+     *
+     * @var array
+     */
     protected $append = ['token', 'config'];
 
     /**
@@ -116,8 +123,6 @@ class User extends Authenticatable
             get: fn () => \App\Flow\Config::orgConfig() ?? [],
         );
     }
-
-
 
     /**
      * Return the JWT Identifier

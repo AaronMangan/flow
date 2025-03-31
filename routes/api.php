@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Document\ApiDocumentController;
 use App\Models\Config;
+use App\Http\Controllers\Api\ApiController;
 
 // Public routes
 Route::post('/auth/token', [AuthController::class, 'generateToken']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    // Protected User API routes
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{id}', [UserController::class, 'show']);
 
@@ -270,6 +270,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     /**
      * Searches for documents
      */
-    // Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [\App\Http\Controllers\Api\Document\ApiDocumentController::class, 'index'])->name('api.document-list');
     Route::middleware(['role:super|admin', 'auth'])->get('/document-list', [ApiDocumentController::class, 'index'])->name('api.document-list');
+
+    /**
+     * Allows the user to save a signature, which is added to outgoing correspondence. This can be found in the profile.
+     */
+    Route::middleware(['role:super|admin', 'auth'])->post('/save-signature', [ApiController::class, 'saveSignature'])->name('api.save-signature');
 });
