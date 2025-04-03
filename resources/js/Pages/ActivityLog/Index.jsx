@@ -3,11 +3,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import DataTable from 'react-data-table-component';
 import dayjs from 'dayjs';
-import { Inertia } from '@inertiajs/inertia';
 import FilterBar from '@/Components/FilterBar';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { router } from '@inertiajs/react'
-import { truncateText, removeKeys } from '@/Utils/helpers';
+import { EyeIcon } from '@heroicons/react/24/outline';
 
 export default function Dashboard({ history, filters }) {
   const { data, current_page, last_page } = history;
@@ -44,17 +43,6 @@ export default function Dashboard({ history, filters }) {
       width: 'auto'
     },
     {
-      id: 'data',
-      name: 'Changes',
-      cell: (row) => {
-        const displayData = row?.data ? truncateText(JSON.stringify(removeKeys(row?.data, ['updated_at', 'created_at'])), 200) : 'No Previous Data'
-        return (
-          <Link href={route('activity-log.show', {activity_log: row?.id})} method="get">{displayData}</Link>
-        );
-      },
-      width: '40pc'
-    },
-    {
       id: 'user_id',
       name: 'Made By',
       selector: row => row?.user?.name || 'N/A',
@@ -66,7 +54,17 @@ export default function Dashboard({ history, filters }) {
       selector: row => {
         return dayjs(row.created_at).format('DD/MM/YYYY hh:mm:ss a')
       }
-    }
+    },
+    {
+      id: 'data',
+      name: 'Action',
+      cell: (row) => {
+        return (
+          <Link href={route('activity-log.show', {activity_log: row?.id})} method="get"><EyeIcon className='w-4 h-4'/></Link>
+        );
+      },
+      width: '20pc'
+    },
   ];
   
   /**

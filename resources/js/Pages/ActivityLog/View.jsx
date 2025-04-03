@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import DataView from '@/Components/DataView';
@@ -10,6 +10,7 @@ dayjs.extend(relativeTime);
 
 export default function Dashboard({ auth, data }) {
   const [pageData, setPageData] = useState(data);
+  // JSON.parse(pageData.data) || pageData.data
   return (
     <AuthenticatedLayout>
       <Head title={'View History'} />
@@ -35,7 +36,7 @@ export default function Dashboard({ auth, data }) {
 
         <div className="p-4 rounded-md shadow-md bg-gray-50">
           <p className="font-semibold text-gray-800">Change Summary:</p>
-          <DataView data={JSON.parse(pageData.data)} />
+          <DataView data={(typeof pageData.data === 'string') ? JSON.parse(pageData.data) : pageData.data} />
         </div>
 
         {/* Detailed Log Section */}

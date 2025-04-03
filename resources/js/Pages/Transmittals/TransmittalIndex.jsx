@@ -5,7 +5,7 @@ import TableView from '@/Components/TableView';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Head } from '@inertiajs/react';
 import { EyeIcon, TrashIcon, UserIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
-import { truncateText } from "../../Utils/helpers";
+import { truncateText, processMessages } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
 import FloatingButton from '@/Components/FloatingButton';
 import { router } from '@inertiajs/react';
@@ -26,7 +26,14 @@ export default function TransmittalIndex({ transmittals, messages }) {
      */
     const sendTransmittal = (e, id) => {
         e.preventDefault();
-        axios.post(route('transmittal.send', {transmittal: id})).catch(ex => console.error(ex))
+        axios.post(route('transmittal.send', {transmittal: id})).then(res => {
+            if(res?.data && res?.data?.messages) {
+                processMessages(res?.data?.messages)
+            }
+        }).catch(ex => {
+            toast.error('An error occurred when resending the transmittal, please check the details and try again or contact your administrator for support');
+            console.error(ex)}
+        )
     }
 
     const deleteTx = (e, row) => {
@@ -135,7 +142,7 @@ export default function TransmittalIndex({ transmittals, messages }) {
                                     <DangerButton
                                         id={'send_' + row?.id}
                                         onClick={(e) => {
-                                            sendTransmittal(row?.id);
+                                            sendTransmittal(e, row?.id);
                                         }}
                                         className='mr-2'
                                     >
