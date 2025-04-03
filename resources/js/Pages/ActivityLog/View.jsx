@@ -10,7 +10,7 @@ dayjs.extend(relativeTime);
 
 export default function Dashboard({ auth, data }) {
   const [pageData, setPageData] = useState(data);
-  // JSON.parse(pageData.data) || pageData.data
+
   return (
     <AuthenticatedLayout>
       <Head title={'View History'} />
