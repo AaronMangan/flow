@@ -16,6 +16,7 @@ import {
   GlobeAltIcon,
   TagIcon,
   DocumentIcon,
+  EnvelopeOpenIcon,
   DocumentPlusIcon,
   PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
@@ -74,6 +75,12 @@ const Sidebar = ({ user }) => {
           name: 'All Transmittals',
           icon: <DocumentIcon className="w-7 h-7" />,
           path: '/transmittals',
+          visibility: () => (userHasRole('admin') || userHasRole('super')),
+        },
+        {
+          name: 'Incoming Transmittals',
+          icon: <EnvelopeOpenIcon className="w-7 h-7" />,
+          path: '/incoming-transmittals',
           visibility: () => (userHasRole('admin') || userHasRole('super')),
         }
       ],
