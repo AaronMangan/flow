@@ -67,6 +67,6 @@ class ActivityLogController extends Controller
             $query->withoutGlobalScope(\App\Models\Scopes\OrganisationScope::class);
         }
 
-        return $query->paginate(50);
+        return $query->orderBy('created_at', 'desc')->paginate(50);
     }
 }

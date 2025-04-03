@@ -47,7 +47,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['organisation'];
+    protected $with = ['organisation', 'status'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -82,7 +82,7 @@ class User extends Authenticatable
 
     public function status()
     {
-        return $this->belongsTo(\App\Models\Status::class);
+        return $this->belongsTo(\App\Models\Status::class) ?? null;
     }
 
     public function organisation()
