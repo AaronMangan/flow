@@ -142,6 +142,7 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
 
     // Incoming Transmittal Routes
     Route::get('/incoming-transmittals', [IncomingTransmittalController::class, 'index'])->name('transmittals.incoming');
+    Route::get('/incoming-transmittals/{transmittal}/view', [IncomingTransmittalController::class, 'show'])->name('transmittals.incoming.view');
 
 });
 

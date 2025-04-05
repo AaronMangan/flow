@@ -276,4 +276,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
      * Allows the user to save a signature, which is added to outgoing correspondence. This can be found in the profile.
      */
     Route::middleware(['role:super|admin', 'auth'])->post('/save-signature', [ApiController::class, 'saveSignature'])->name('api.save-signature');
+
+    /**
+     * Allows the user to acknowledge a transmittal. This is used for quick acknowledge, or when an authenticated user acknowledges.
+     */
+    Route::middleware(['role:super|admin', 'auth'])->post('/transmittal/{transmittal}/acknowledge', [ApiController::class, 'acknowledgeTransmittal'])->name('api.transmittal.acknowledge');
 });

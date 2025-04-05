@@ -3,6 +3,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { ConfirmProvider } from './Utils/useConfirm';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Flow';
 
@@ -15,12 +16,14 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         if (import.meta.env.SSR) {
-            hydrateRoot(el, <App {...props} />);
+            hydrateRoot(el, <ConfirmProvider><App {...props} /></ConfirmProvider>);
             return;
         }
 
         createRoot(el).render(
-            <App {...props} />
+            <ConfirmProvider>
+                <App {...props} />
+            </ConfirmProvider>
         );
     },
     progress: {

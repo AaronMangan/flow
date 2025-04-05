@@ -13,6 +13,7 @@ return new class () extends Migration {
         Schema::table('users', function (Blueprint $table) {
             // Adds a signature columns as text. Used to store the base64 signature data for a user.
             $table->longText('signature')->nullable();
+            $table->boolean('has_signature')->default(false);
         });
     }
 
@@ -22,7 +23,7 @@ return new class () extends Migration {
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('signature');
+            $table->dropColumn(['signature', 'has_signature']);
         });
     }
 };

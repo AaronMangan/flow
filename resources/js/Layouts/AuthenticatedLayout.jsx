@@ -7,9 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
     const success = usePage().props.success || null;
-    useEffect(() => {
-        // 
-    }, []);
+
     return (
         <div className={`flex min-h-screen bg-gray-100 w-full min-w-screen dark:bg-gray-900 transition-all`}>
             {/* Sidebar */}
