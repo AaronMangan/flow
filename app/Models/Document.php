@@ -8,17 +8,30 @@ use App\Models\Discipline;
 use App\Traits\LogsActivity;
 use App\Models\Scopes\OrganisationScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[ScopedBy([OrganisationScope::class])]
 class Document extends Model
 {
     use LogsActivity;
+    use HasFactory;
 
+    /**
+     * Fillable properties, these can be manipulated by user actions (i.e. forms)
+     *
+     * @var array
+     */
     protected $fillable = [
         'name', 'description', 'user_id', 'organisation_id', 'document_status_id', 'discipline_id', 'type_id', 'area_id', 'revision_id', 'document_number'
     ];
-    //
-    public function tags()
+
+    /**
+     * Returns the tags associated with the document instance.
+     *
+     * @return void
+     */
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
@@ -73,8 +86,13 @@ class Document extends Model
         return $this->hasOne(\App\Models\DocumentStatus::class, 'id', 'document_status_id');
     }
 
-    public function transmittals()
+    /**
+     * Return all transmittals that a document belongs to.
+     *
+     * @return void
+     */
+    public function transmittals(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Transmittal::class);
+        return $this->belongsToMany(\App\Models\Transmittal::class) ?? null;
     }
 }

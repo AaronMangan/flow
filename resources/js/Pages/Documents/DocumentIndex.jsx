@@ -14,6 +14,7 @@ import { removeKeys } from '@/Utils/helpers';
 import { ExclamationCircleIcon, DocumentTextIcon, TrashIcon, PencilIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import dayjs from 'dayjs';
 import DescriptionList from '@/Components/DescriptionList';
+import { objectToQuery } from '@/Utils/helpers';
 
 export default function ViewDocuments({ documents, messages, metadata }) {
   let debounceTimer;
@@ -155,8 +156,14 @@ export default function ViewDocuments({ documents, messages, metadata }) {
 
   // Runs when filters change.
   useEffect(() => {
-    if(typeof filters.search !== 'undefined') {
-      router.visit('documents?search=' + filters?.search || '', {
+    if(typeof filters.search !== 'undefined' || filters?.discipline !== 'all') {
+      const rawQuery = {
+        search: filters?.search || '',
+        discipline: filters?.discipline || 'all'
+      }
+
+      const params = objectToQuery(rawQuery);
+      router.visit(`documents?${params}`, {
         preserveState: true,
         only: ['documents'],
         replace: true
@@ -218,7 +225,6 @@ export default function ViewDocuments({ documents, messages, metadata }) {
         }/>
 
         <Modal show={showDocumentDetails} onClose={closeModal} maxWidth={'2xl'} >
-          {/* <div className='px-4 py-4 overflow-y-auto'> */}
           <div className={!activeDocument?.latest_activity ? 'relative mb-0 pb-4  max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg' : 'relative mb-0 pb-0  max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white p-6 shadow-lg'}>
             <dl className="grid grid-cols-1 gap-x-8 gap-y-4">
               <div className='flex justify-between flex-inline'>

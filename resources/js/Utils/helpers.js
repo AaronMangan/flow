@@ -32,24 +32,6 @@ export const debounce = (func, delay = 300) => {
  * @param {any} keys
  * @returns {any}
  */
-// export const removeKeys = (obj, keysToRemove) => {
-//     try {
-//         if (typeof t !== "string") {
-//             obj = JSON.stringify(obj); // Convert objects or arrays to a string first
-//         }
-//         // Try parsing once
-//         const parsedOnce = JSON.parse(obj);
-
-//         // If it's still a string, it was double-encoded
-//         if (typeof parsedOnce === "string") {
-//             return JSON.parse(parsedOnce); // Parse again to fix it
-//         }
-
-//         return parsedOnce; // It was correctly encoded, return as is
-//     } catch (error) {
-//         return obj; // Not a valid JSON string, return as is
-//     }
-// }
 export const removeKeys = (obj, keysToRemove) => {
     try {
         // Convert to a JSON string before parsing
@@ -101,4 +83,16 @@ export const processMessages = (messages) => {
             }
         })
     });
+}
+
+/**
+ * Converts an object into a query string and handles 'undefined' or null values.
+ * @param {*} obj 
+ * @returns {string} queryString
+ */
+export const objectToQuery = (obj) => {
+    const cleanedParams = Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => v != null)
+    );
+    return new URLSearchParams(cleanedParams).toString();
 }

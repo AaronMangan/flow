@@ -104,7 +104,7 @@ class DocumentController extends Controller
      */
     public function edit(Request $request, Document $document)
     {
-        if ($request->user()->cannot('update', Document::class)) {
+        if ($request->user()->cannot('update', $request->user(), Document::class)) {
             abort(403);
         }
 
@@ -179,14 +179,38 @@ class DocumentController extends Controller
             $query->withoutGlobalScope(OrganisationScope::class);
             if (isset($params['search'])) {
                 $query->where(function ($subquery) use ($params) {
-                    return $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
+                    $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
+                    return $subquery;
                 });
             }
+
+            // If the discipline filter is set.
+            if (isset($params['discipline']) && $params['discipline'] !== 'all') {
+                $query->where(function($sub) use ($params) {
+                    return $sub->where('discipline_id', '=', $params['discipline']);
+                });
+            }
+
             return $query->get()->load('discipline', 'area', 'type', 'document_status', 'revision', 'latestActivity', 'latestActivity.user')->toArray();
         }
 
-        return $query->where('organisation_id', \Auth::user()->organisation_id)
-            ->get()->load('discipline', 'area', 'type', 'document_status', 'revision', 'latestActivity', 'latestActivity.user')->toArray() ?? [];
+        /**
+         * Build the query for non super users (Admins & Users).
+         */
+        $query->where('organisation_id', \Auth::user()->organisation_id);
+        
+        if (isset($params['search'])) {
+            $query->where(function ($subquery) use ($params) {
+                return $subquery->where('name', 'like', "%{$params['search']}%")->orWhere('document_number', 'like', "%{$params['search']}%");
+            });
+        }
+
+        if (isset($params['discipline']) && $params['discipline'] !== 'all') {
+            $query->where(function($sub) use ($params) {
+                return $sub->where('discipline_id', '=', $params['discipline']);
+            });
+        }
+        return $query->get()->load('discipline', 'area', 'type', 'document_status', 'revision', 'latestActivity', 'latestActivity.user')->toArray() ?? [];
     }
 
     /**

@@ -13,6 +13,8 @@ class OrganisationScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $builder->where('organisation_id', \Auth::user()->organisation_id);
+        if(\Auth::check()) {
+            $builder->where('organisation_id', \Auth::user()->organisation_id);
+        }
     }
 }
