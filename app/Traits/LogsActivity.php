@@ -64,4 +64,21 @@ trait LogsActivity
         ]);
         return true;
     }
+
+    /**
+     * Activity Log relationships. These need to be morph many because they can be a number of different models.
+     */
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'model_id')
+            ->where('model_name', self::class)
+            ->latest();
+    }
+
+    public function latestActivity()
+    {
+        return $this->hasOne(ActivityLog::class, 'model_id')
+            ->where('model_name', self::class)
+            ->latestOfMany();
+    }
 }

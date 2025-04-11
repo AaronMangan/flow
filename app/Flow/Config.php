@@ -16,7 +16,8 @@ class Config
     {
         // User can only return configs for their organisation.
         if (!\Auth::check()) {
-            throw new \Exception('User not authenticated', 404);
+            // throw new \Exception('User not authenticated', 404);
+            return false;
         }
 
         // Get user organisation id.
@@ -43,7 +44,8 @@ class Config
     public static function orgConfig(): array
     {
         if (!\Auth::check()) {
-            throw new \Exception('User not authenticated', 404);
+            // throw new \Exception('User not authenticated', 404);
+            return [];
         }
 
         // Get user organisation id.

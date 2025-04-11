@@ -33,7 +33,7 @@ class SendTransmittalEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Transmittal',
+            subject: (!isset($this->transmittal->sent_at)) ? 'New Transmittal' : 'Re-issued Transmittal',
         );
     }
 
@@ -43,7 +43,7 @@ class SendTransmittalEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.transmittals.send',
+            view: (!isset($this->transmittal->sent_at)) ? 'emails.transmittals.send' : 'emails.transmittals.resend',
         );
     }
 

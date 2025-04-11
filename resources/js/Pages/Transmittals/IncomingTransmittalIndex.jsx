@@ -3,8 +3,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import DangerButton from '@/Components/DangerButton';
 import TableView from '@/Components/TableView';
 import SecondaryButton from '@/Components/SecondaryButton';
-import { Head } from '@inertiajs/react';
-import { EyeIcon, TrashIcon, UserIcon, PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { Head, usePage } from '@inertiajs/react';
+import { EyeIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { truncateText, processMessages } from "../../Utils/helpers";
 import Tooltip from '@/Components/Tooltip';
 import FloatingButton from '@/Components/FloatingButton';
@@ -12,41 +12,36 @@ import { router } from '@inertiajs/react';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { useConfirm } from '../../Utils/useConfirm';
 
 export default function TransmittalIndex({ transmittals, messages }) {
-    /**
-     * Route to the create transmittal page.
-     */
-    const createTransmittal = () => {
-        router.get(route('transmittal.create'))
-    }
+    const user = usePage().props.auth.user;
+    const confirm = useConfirm();
 
     /**
-     * Validates & Sends the transmittal to its selected recipients.
+     * View the incoming transmittal.
+     * @param {any} id The id of the transmittal.
+     * @returns {void} Redirects the user to the view transmittal page.
      */
-    const sendTransmittal = (e, id) => {
-        e.preventDefault();
-        axios.post(route('transmittal.send', {transmittal: id})).then(res => {
-            if(res?.data && res?.data?.messages) {
-                processMessages(res?.data?.messages)
-            }
-        }).catch(ex => {
-            toast.error('An error occurred when resending the transmittal, please check the details and try again or contact your administrator for support');
-            console.error(ex)}
-        )
-    }
+    const viewTransmittal = (id) => {
+        router.visit(route('transmittals.incoming.view', {transmittal: id}))
+    };
 
-    const deleteTx = (e, row) => {
-        e.preventdefault();
-        // The transmittal has already been sent, so it cannot be deleted.
-        if(row?.sent_at && (row?.sent_at != null || typeof row?.sent_at != 'undefined')) {
-            toast.warning('Transmittals that have been sent cannot be deleted, please contact your administrator for assistance');
-            return;
+    const acknowledgeTx = async (id) => {
+        const confirmed = await confirm({
+            title: "Acknowledge Transmittal?",
+            message: "Acknowledge this transmittal as received and correct?",
+            titleClass: "text-xl font-bold",
+            messageClass: "my-4 text-gray-600",
+            confirmClass: "bg-[#942af7] text-white px-4 rounded py-2"
+        });
+    
+        if (confirmed) {
+            axios.post(route('api.transmittal.acknowledge', {transmittal: id}), {}).then(res => {console.log(res)}).catch(ex => {console.error(ex)})
         } else {
-            // If it hasn't been issued yet, it can be deleted.
-            toast.error('TODO: Delete unsent transmittals');
+            console.log("User cancelled....");
         }
-    }
+    };
 
     /**
      * Custom Styles for the table headers
@@ -112,59 +107,26 @@ export default function TransmittalIndex({ transmittals, messages }) {
             cell: (row) => {
                 return (
                     <>
-                        <SecondaryButton
-                            id={'edit_' + row?.id}
-                            onClick={(e) => {
-                                alert('To Be Done!');
-                            }}
-                            className='mr-2'
-                        >
-                            <EyeIcon className="w-3 h-3 mr-2"/>View
-                        </SecondaryButton>
-                        {row?.sent_at === null && (
-                            <>
-                                <div>
-                                    <PrimaryButton
-                                        id={'send_' + row?.id}
-                                        onClick={(e) => {
-                                            sendTransmittal(e, row?.id);
-                                        }}
-                                        className='mr-2'
-                                    >
-                                        <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Send
-                                    </PrimaryButton>
-                                </div>
-                            </>
-                        )}
-                        {row?.sent_at !== null && (
+                        <div>
+                            <SecondaryButton
+                                id={'edit_' + row?.id}
+                                onClick={(e) => viewTransmittal(row?.id)}
+                                className='mr-2'
+                            >
+                                <EyeIcon className="w-3 h-3 mr-2"/>View
+                            </SecondaryButton>
+                        </div>
+                        {row?.id && (!row?.acknowledgement_at || row?.acknowledged_at === null) && user?.has_signature && (
                             <div>
-                                <Tooltip text='Re-issue the transmittal with the exact documents and revisions'>
-                                    <DangerButton
-                                        id={'send_' + row?.id}
-                                        onClick={(e) => {
-                                            sendTransmittal(e, row?.id);
-                                        }}
-                                        className='mr-2'
+                                <Tooltip text='Quick acknowledge this transmittal, using the signature in your profile. This option is only available if you have a signature'>
+                                    <PrimaryButton
+                                        onClick={(e) => acknowledgeTx(row?.id)}
                                     >
-                                        <PaperAirplaneIcon className="w-3 h-3 mr-2"/>Resend
-                                    </DangerButton>
+                                        <PencilSquareIcon className='w-3 h-3 mr-2' />Acknowledge
+                                    </PrimaryButton>
                                 </Tooltip>
                             </div>
                         )}
-                        <div>
-                            <Tooltip text='Issued transmittals cannot be deleted. Please contact your administrator if you need assistance'>
-                                <DangerButton
-                                    disabled={(row?.sent_at != null) ? true : false}
-                                    id={'send_' + row?.id}
-                                    onClick={(e) => {
-                                        deleteTx(e, row)
-                                    }}
-                                    className='mr-2'
-                                >
-                                    <TrashIcon className="w-3 h-3 mr-2"/> Delete
-                                </DangerButton>
-                            </Tooltip>
-                        </div>
                     </>
                 );
             },
@@ -184,6 +146,11 @@ export default function TransmittalIndex({ transmittals, messages }) {
             toast.error(messages?.error)
         }
     }, [messages]);
+
+    useEffect(() => {
+        // console.log(user?.has_signature)
+    }, []);
+
     return (
         <AuthenticatedLayout>
             <Head title="Transmittal Index" />

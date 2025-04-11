@@ -146,7 +146,7 @@ export default function UserIndex({ auth, users }) {
         {
             name: 'Status',
             cell: (data) => {
-                return <Badge value={data.status.name.toUpperCase() || 'N/A'}></Badge>
+                return <Badge value={data?.status?.name?.toUpperCase() || 'N/A'}></Badge>
             },
             width: '8pc',
         },

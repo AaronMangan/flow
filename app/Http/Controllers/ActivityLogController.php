@@ -63,8 +63,10 @@ class ActivityLogController extends Controller
 
         if (!auth()->user()->hasRole('super')) {
             $query->where('organisation_id', auth()->user()->organisation_id);
+        } else {
+            $query->withoutGlobalScope(\App\Models\Scopes\OrganisationScope::class);
         }
 
-        return $query->paginate(50);
+        return $query->orderBy('created_at', 'desc')->paginate(50);
     }
 }

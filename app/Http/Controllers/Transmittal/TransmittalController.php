@@ -156,7 +156,7 @@ class TransmittalController extends Controller
 
         // If the user is a super admin, return all documents.
         if (\Auth::user()->hasRole('super')) {
-            return $query->get()->load('documents', 'status')->toArray();
+            return $query->withoutGlobalScope(\App\Models\Scopes\OrganisationScope::class)->get()->load('documents', 'status')->toArray();
         }
 
         // Otherwise, simply return the documents for that organisation.
@@ -188,7 +188,7 @@ class TransmittalController extends Controller
 
         /* Prepare a details array, with information needed to prepare a transmittal */
         $details = [
-            'to' => implode("; ", $transmittal->to),
+            'to' => $transmittal->to ?? null,
             'addressee' => 'Document Controller',
             'body' => $transmittal->details ?? '',
             'from' => $config['email_from'] ?? $request->user()->email,
@@ -200,20 +200,22 @@ class TransmittalController extends Controller
         ];
 
         try {
-            // Send the email
+            // Send the email. This will result in a truthy value, so to check it, use double-negation.
             $mailed = \Mail::to($details['to'])->send(new SendTransmittalEmail($details, $transmittal));
 
-            if ($mailed) {
-                $transmittal->sent_at = now();
-                $transmittal->save();
+            $transmittal->sent_at = now();
+            $transmittal->save();
 
-                return Inertia::render('Transmittals/TransmittalIndex', [
-                    'transmittals' => $this->getTransmittals($request->all()),
-                    'messages' => [
-                        'success' => 'The transmittal was sent successfully!'
-                    ]
-                ]);
+            $messages = [];
+            if (!!$mailed) {
+                $messages['success'] = 'Transmittal was sent successfully';
+            } else {
+                $messages['error'] = 'An error occurred, please contact your administrator';
             }
+            return response()->json([
+                'status' => (!is_null($mailed)) ? 'success' : 'fail',
+                'messages' => $messages
+            ]);
         } catch (\Exception $ex) {
             throw $ex;
         }

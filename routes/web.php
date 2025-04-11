@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\Transmittal\TransmittalController;
+use App\Http\Controllers\Transmittal\IncomingTransmittalController;
 use App\Http\Controllers\Public\PublicTransmittalController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -133,10 +134,16 @@ Route::middleware(['role:super|admin', 'auth'])->group(function () {
  * Transmittal Routes
  */
 Route::middleware(['role:super|admin', 'auth'])->group(function () {
+    // Outgoing Transmittal Routes
     Route::get('/transmittals', [TransmittalController::class, 'index'])->name('transmittals');
     Route::get('/transmittals/create', [TransmittalController::class, 'create'])->name('transmittal.create');
     Route::post('/transmittal/create', [TransmittalController::class, 'store'])->name('transmittal.store');
     Route::post('/transmittal/{transmittal}/send', [TransmittalController::class, 'send'])->name('transmittal.send');
+
+    // Incoming Transmittal Routes
+    Route::get('/incoming-transmittals', [IncomingTransmittalController::class, 'index'])->name('transmittals.incoming');
+    Route::get('/incoming-transmittals/{transmittal}/view', [IncomingTransmittalController::class, 'show'])->name('transmittals.incoming.view');
+
 });
 
 /**

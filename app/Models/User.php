@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,7 +33,9 @@ class User extends Authenticatable
         'email',
         'password',
         'organisation_id',
-        'status_id'
+        'status_id',
+        'signature',
+        'has_signature',
     ];
 
     /**
@@ -42,7 +43,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['organisation'];
+    protected $with = ['organisation', 'status'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -52,9 +53,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'signature'
     ];
 
-    protected $append = ['token', 'config'];
+    /**
+     * Appends these attributes.
+     *
+     * @var array
+     */
+    protected $appends = ['token', 'config'];
 
     /**
      * Get the attributes that should be cast.
@@ -66,12 +73,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'has_signature' => 'boolean'
         ];
     }
 
     public function status()
     {
-        return $this->belongsTo(\App\Models\Status::class);
+        return $this->belongsTo(\App\Models\Status::class) ?? null;
     }
 
     public function organisation()
@@ -112,8 +120,6 @@ class User extends Authenticatable
             get: fn () => \App\Flow\Config::orgConfig() ?? [],
         );
     }
-
-
 
     /**
      * Return the JWT Identifier
